@@ -1,0 +1,4 @@
+name: untitled
+version: '1.0-SNAPSHOT'
+main: com.example.untitled.Untitled
+api-version: '1.21'
