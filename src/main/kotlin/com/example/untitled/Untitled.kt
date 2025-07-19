@@ -1,6 +1,8 @@
 package com.example.untitled
 
 import com.example.untitled.events.onPlayerInteract
+import com.example.untitled.events.onTick
+import com.example.untitled.luaLoader.EventManager
 import com.example.untitled.luaLoader.ScriptLoader
 import com.example.untitled.luaLoader.ScriptManager
 import io.papermc.paper.command.brigadier.Commands
@@ -11,15 +13,13 @@ class Untitled : JavaPlugin() {
 
     companion object {
         val scriptManager = ScriptManager()
+        val eventManager = EventManager()
     }
 
     override fun onEnable() {
         // Plugin startup logic
         server.pluginManager.registerEvents(onPlayerInteract(), this)
-        //        val dataFolder = dataFolder.resolve("scripts")
-        //        dataFolder.mkdirs()
-        //        val scriptLoc = dataFolder.resolve("hello.lua").createNewFile()
-        //        println("Datafolder location: ${scriptLoc}")
+        server.pluginManager.registerEvents(onTick(), this)
 
         scriptManager.loader = ScriptLoader(dataFolder)
         scriptManager.reload()
@@ -39,9 +39,7 @@ class Untitled : JavaPlugin() {
                                 ctx1.source.sender.sendMessage(
                                     "Persistent: ${scriptManager.persistentStorage}"
                                 )
-                                ctx1.source.sender.sendMessage(
-                                    "Normal: ${scriptManager.storage}"
-                                )
+                                ctx1.source.sender.sendMessage("Normal: ${scriptManager.storage}")
                                 return@executes 0
                             })
                             .build()

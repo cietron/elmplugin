@@ -1,6 +1,9 @@
 package com.example.untitled.spell
 
 import com.example.untitled.Untitled
+import com.example.untitled.luaApi.impl.CaptureModule
+import com.example.untitled.luaApi.impl.EntityModule
+import com.example.untitled.luaApi.impl.EventModule
 import com.example.untitled.luaApi.impl.PlayerModule
 import com.example.untitled.luaLoader.LuaGlobalFactory
 import com.example.untitled.luaLoader.ScriptManager
@@ -33,6 +36,9 @@ class spell {
             val chunk =
                 LuaGlobalFactory.defaultUserGlobal()
                     .addLibrary(PlayerModule(event.player))
+                    .addLibrary(CaptureModule())
+                    .addLibrary(EntityModule())
+                    .addLibrary(EventModule())
                     .makeChunk(script)
 
             chunk.call()
