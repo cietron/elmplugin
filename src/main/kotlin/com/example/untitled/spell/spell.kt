@@ -39,6 +39,7 @@ class spell {
                     .addLibrary(CaptureModule())
                     .addLibrary(EntityModule())
                     .addLibrary(EventModule())
+                    .buildUserLibrary()
                     .makeChunk(script)
 
             chunk.call()

@@ -67,6 +67,7 @@ class ScriptManager() {
     enum class ScriptType(val persistent: Boolean) {
         spell(true),
         item(false),
+        library(true),
         none(false),
     }
 }

@@ -9,9 +9,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 class SendPlayerMessageImpl : SendPlayerMessage, TwoArgFunction() {
     override fun call_b(playerName: LuaString, message: LuaString): LuaBoolean {
-        if (
-            !playerName.isstring() || !message.isstring()
-        ) {
+        if (!playerName.isstring() || !message.isstring()) {
             return FALSE
         }
         val player = Bukkit.getServer().getPlayer(playerName.toString())

@@ -14,6 +14,7 @@ class ScriptLoader(val pluginDirectory: File) {
                     when (dir.name) {
                         "spells" -> ScriptManager.ScriptType.spell
                         "items" -> ScriptManager.ScriptType.item
+                        "lib" -> ScriptManager.ScriptType.library
                         else -> ScriptManager.ScriptType.none
                     }
 
