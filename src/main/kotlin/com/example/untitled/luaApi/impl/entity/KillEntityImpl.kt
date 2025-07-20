@@ -11,7 +11,7 @@ import java.util.*
 class KillEntityImpl : OneArgFunction(), KillEntity {
     override fun call(arg: LuaValue?): LuaValue? {
         if (arg !is LuaString) {
-            return LuaValue.error("arg is not an string")
+            return error("arg is not an string")
         }
         try {
             UUID.fromString(arg.tojstring())

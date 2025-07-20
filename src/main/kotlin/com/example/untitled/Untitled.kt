@@ -5,6 +5,7 @@ import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
 import com.example.untitled.luaLoader.ScriptLoader
 import com.example.untitled.luaLoader.ScriptManager
+import com.example.untitled.storage.SimpleStorage
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.java.JavaPlugin
@@ -12,12 +13,20 @@ import org.bukkit.plugin.java.JavaPlugin
 class Untitled : JavaPlugin() {
 
     companion object {
+
+        // Could be a bad idea
+        lateinit var instance: Untitled
+            private set
+
         val scriptManager = ScriptManager()
         val eventManager = EventManager()
+        val simpleStorage = SimpleStorage()
     }
 
     override fun onEnable() {
         // Plugin startup logic
+        instance = this
+
         server.pluginManager.registerEvents(onPlayerInteract(), this)
         server.pluginManager.registerEvents(onTick(), this)
 
@@ -53,6 +62,20 @@ class Untitled : JavaPlugin() {
                                 scriptManager.reload()
                                 return@executes 0
                             }
+                            .build()
+                    )
+
+                event
+                    .registrar()
+                    ?.register(
+                        Commands.literal("DumpStorage")
+                            .executes({ ctx1 ->
+                                simpleStorage.debugDump()
+                                ctx1.source.sender.sendMessage(
+                                    "Storage content has been printed to the server console"
+                                )
+                                return@executes 0
+                            })
                             .build()
                     )
             },

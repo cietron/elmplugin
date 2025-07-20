@@ -10,7 +10,7 @@ import java.util.*
 class EyesightTargetImpl : OneArgFunction(), EyesightTarget {
     override fun call(arg: LuaValue?): LuaValue? {
         if (arg !is LuaString) {
-            return LuaValue.error("arg is not an string")
+            return error("arg is not an string")
         }
         try {
             UUID.fromString(arg.tojstring())
@@ -18,7 +18,7 @@ class EyesightTargetImpl : OneArgFunction(), EyesightTarget {
             return error("arg is not an UUID string")
         }
 
-        return this.get(arg) ?: LuaValue.NIL
+        return this.get(arg) ?: NIL
     }
 
     override fun get(casterUUID: LuaString): LuaString? {
@@ -31,6 +31,6 @@ class EyesightTargetImpl : OneArgFunction(), EyesightTarget {
             return null
         }
 
-        return LuaValue.valueOf(hit.uniqueId.toString())
+        return valueOf(hit.uniqueId.toString())
     }
 }

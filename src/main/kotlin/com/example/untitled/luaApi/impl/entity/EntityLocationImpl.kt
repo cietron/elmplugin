@@ -23,7 +23,7 @@ class EntityLocationImpl : OneArgFunction(), EntityLocation {
             (Bukkit.getServer().getEntity(UUID.fromString(entityUUID.tojstring())) as LivingEntity)
                 .location
 
-        val toLuaValue = { d: Double -> LuaValue.valueOf(d) }
+        val toLuaValue = { d: Double -> valueOf(d) }
 
         val table = LuaTable()
         table.insert(1, toLuaValue(entityLocation.x))

@@ -1,6 +1,7 @@
 package com.example.untitled.spell
 
 import com.example.untitled.Untitled
+import com.example.untitled.luaAdapter.PlayMod
 import com.example.untitled.luaApi.impl.CaptureModule
 import com.example.untitled.luaApi.impl.EntityModule
 import com.example.untitled.luaApi.impl.EventModule
@@ -39,6 +40,7 @@ class spell {
                     .addLibrary(CaptureModule())
                     .addLibrary(EntityModule())
                     .addLibrary(EventModule())
+                    .addLibrary(PlayMod(event.player))
                     .buildUserLibrary()
                     .makeChunk(script)
 
