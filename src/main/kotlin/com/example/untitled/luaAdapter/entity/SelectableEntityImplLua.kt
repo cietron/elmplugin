@@ -1,22 +1,34 @@
 package com.example.untitled.luaAdapter.entity
 
-import com.example.untitled.apiImpl.entity.SelectableEntityImpl
+import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.luaAdapter.util.BaseLuaTable
+import com.example.untitled.luaAdapter.util.Vector3dTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 
-class SelectableEntityImplLua(val impl: SelectableEntityImpl) : BaseLuaTable(CLASS_NAME) {
+class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(CLASS_NAME, true) {
 
     companion object {
         const val CLASS_NAME = "selectable_entity"
     }
 
-    override fun modifyTable(table: LuaTable) {
+    override fun modifyTable(
+        table: LuaTable,
+        container: Container
+    ) {
+        val impl = container.entity
+
         table.set("uuid", impl.uuid.toString())
         table.set("health", impl.health)
         table.set("mana", impl.mana)
+        table.set("location", Vector3dTable().getTable(LuaTable(), Vector3dTable.Container(impl.position)))
+        table.set(
+            "normalizedFacingVector",
+            Vector3dTable().getTable(LuaTable(), Vector3dTable.Container(impl.normalizedFacingVector))
+        )
 
         // Lua: entity:get_attribute("attr_name")
         table.set(
@@ -37,7 +49,6 @@ class SelectableEntityImplLua(val impl: SelectableEntityImpl) : BaseLuaTable(CLA
                 }
             },
         )
-
         // Lua: entity:set_attribute("attr_name", value)
         table.set(
             "set_attribute",
@@ -55,5 +66,40 @@ class SelectableEntityImplLua(val impl: SelectableEntityImpl) : BaseLuaTable(CLA
                 }
             },
         )
+
+        table.set(
+            "get_velocity",
+            object : ZeroArgFunction() {
+                override fun call(): LuaValue? {
+                    val velocity = Vector3dTable.Container(impl.getVelocity())
+                    return Vector3dTable().getTable(LuaTable(), velocity)
+                }
+            }
+        )
+
+        table.set(
+            "set_velocity",
+            object : OneArgFunction() {
+                override fun call(arg: LuaValue?): LuaValue? {
+
+                    val converted = Vector3dTable().fromLuaValue(arg)
+
+                    converted ?: return NIL
+
+                    impl.setVelocity(converted.vector)
+                    return TRUE
+                }
+            }
+        )
     }
+
+    override fun checkParseTable(table: LuaTable): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun fromTable(table: LuaTable): Container? {
+        TODO("Not yet implemented")
+    }
+
+    data class Container(val entity: SelectableEntity)
 }

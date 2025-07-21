@@ -13,6 +13,9 @@ class GetSpellCasterImplLua(private val getSpellCasterImpl: GetSpellCasterImpl) 
             return NIL
         }
 
-        return PlayerImplBaseLua(getSpellCasterImpl.getSpellCaster()!!).getTable(LuaTable())
+        return PlayerImplBaseLua().getTable(
+            LuaTable(),
+            PlayerImplBaseLua.Container(getSpellCasterImpl.getSpellCaster()!!)
+        )
     }
 }

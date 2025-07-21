@@ -37,6 +37,9 @@ class EyesightEntityImplLua(val impl: EyesightEntityImpl) : TwoArgFunction() {
             return NIL
         }
 
-        return SelectableEntityImplLua(SelectableEntityImpl(result.uuid)).getTable(LuaTable())
+        return SelectableEntityImplLua().getTable(
+            LuaTable(),
+            SelectableEntityImplLua.Container(SelectableEntityImpl(result.uuid))
+        )
     }
 }

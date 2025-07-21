@@ -25,7 +25,10 @@ SOFTWARE.
  */
 package com.example.untitled.luaLoader
 
-import org.luaj.vm2.*
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LoadState
+import org.luaj.vm2.LuaString
+import org.luaj.vm2.LuaValue
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.PackageLib
@@ -67,36 +70,4 @@ class LuaRunner
         chunk.call()
     }
 
-    internal class ReadOnlyLuaTable(table: LuaValue) : LuaTable() {
-        init {
-            presize(table.length(), 0)
-            var n = table.next(NIL)
-            while (!n.arg1().isnil()) {
-                val key = n.arg1()
-                val value = n.arg(2)
-                super.rawset(key, if (value.istable()) ReadOnlyLuaTable(value) else value)
-                n = table.next(n.arg1())
-            }
-        }
-
-        override fun setmetatable(metatable: LuaValue): LuaValue {
-            return error("table is read-only")
-        }
-
-        override fun set(key: Int, value: LuaValue) {
-            error("table is read-only")
-        }
-
-        override fun rawset(key: Int, value: LuaValue) {
-            error("table is read-only")
-        }
-
-        override fun rawset(key: LuaValue, value: LuaValue) {
-            error("table is read-only")
-        }
-
-        override fun remove(pos: Int): LuaValue {
-            return error("table is read-only")
-        }
-    }
 }

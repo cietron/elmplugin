@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm") version "2.2.20-Beta1"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("com.ncorti.ktfmt.gradle") version "0.23.0"
 }
 
 group = "com.example"
@@ -26,7 +25,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.6")
     }
 }
 
@@ -43,4 +42,3 @@ tasks.processResources {
     filesMatching("plugin.yml") { expand(props) }
 }
 
-ktfmt { kotlinLangStyle() }

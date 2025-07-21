@@ -1,7 +1,6 @@
 package com.example.untitled.luaLoader
 
 import com.example.untitled.Untitled
-import com.example.untitled.luaLoader.LuaRunner.ReadOnlyLuaTable
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaString

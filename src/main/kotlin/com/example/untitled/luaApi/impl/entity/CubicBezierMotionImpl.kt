@@ -52,7 +52,9 @@ class CubicBezierMotionImpl : CubicBezierMotion, VarArgFunction() {
             {
                 val entity =
                     Bukkit.getServer().getEntity(UUID.fromString(entityUUID.tojstring()))
-                        as LivingEntity
+                            as LivingEntity?
+
+                entity ?: return@addJavaListener true
 
                 if (tick >= stopTick) {
                     entity.velocity = Vector(0, 0, 0)

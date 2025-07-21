@@ -4,4 +4,6 @@ import com.example.untitled.api.entity.SelectableEntity
 
 interface Player : SelectableEntity {
     val name: String
+
+    fun sendMessage(msg: String)
 }
