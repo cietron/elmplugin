@@ -1,6 +1,5 @@
 package com.example.untitled.luaAdapter.event
 
-import com.example.untitled.Untitled
 import com.example.untitled.api.event.Event
 import com.example.untitled.api.event.EventListener
 import com.example.untitled.api.event.EventManager
@@ -98,7 +97,7 @@ class EventManagerImplLua(private val impl: EventManager) : BaseLuaTable<Unit>("
 
             try {
                 impl.registerEvent(
-                    DynamicLuaEventFactory(Untitled.newEventManager.factory).getEventClass(eventTypeName),
+                    DynamicLuaEventFactory().getEventClass(eventTypeName),
                     kotlinListener
                 )
                 return LuaValue.TRUE

@@ -6,14 +6,7 @@ import com.example.untitled.api.spell.SpellInfo
 
 class BuiltinEvents {
     companion object {
-        interface SpellHit : Event {
-            val spellInfo: SpellInfo
-            val caster: Player
-            val target: SelectableEntity
-        }
-
-        interface OnTick : Event {
-
-        }
+        class SpellHit(val spellInfo: SpellInfo, val caster: Player, val target: SelectableEntity) : Event {}
+        class OnTick : Event {}
     }
 }

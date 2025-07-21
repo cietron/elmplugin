@@ -2,7 +2,6 @@ package com.example.untitled.luaAdapter.event
 
 import com.example.untitled.api.event.BuiltinEvents
 import com.example.untitled.api.event.Event
-import com.example.untitled.api.event.EventFactory
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import kotlin.reflect.KClass
@@ -12,11 +11,11 @@ interface LuaEventFactory {
     fun getEventClass(type: String): KClass<out Event>
 }
 
-class DynamicLuaEventFactory(impl: EventFactory) : LuaEventFactory {
+class DynamicLuaEventFactory : LuaEventFactory {
     private val eventClasses = HashMap<String, KClass<out Event>>()
 
     init {
-        eventClasses["on_tick"] = impl.createOnTick()::class
+        eventClasses["on_tick"] = BuiltinEvents.Companion.OnTick::class
     }
 
     companion object {

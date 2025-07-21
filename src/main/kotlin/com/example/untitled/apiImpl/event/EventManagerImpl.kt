@@ -8,7 +8,6 @@ import kotlin.reflect.KClass
 class EventManagerImpl : EventManager {
 
     private val listeners = HashMap<KClass<out Event>, MutableList<EventListener<out Event>>>()
-    val factory = EventFactoryImpl()
 
     override fun <T : Event> registerEvent(event: KClass<out T>, listener: EventListener<T>) {
         listeners.getOrPut(event) { ArrayList() }.add(listener)
