@@ -1,5 +1,6 @@
 package com.example.untitled
 
+import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
@@ -21,6 +22,7 @@ class Untitled : JavaPlugin() {
         val scriptManager = ScriptManager()
         val eventManager = EventManager()
         val simpleStorage = SimpleStorage()
+        val newEventManager = EventManagerImpl()
     }
 
     override fun onEnable() {
@@ -74,6 +76,17 @@ class Untitled : JavaPlugin() {
                                 ctx1.source.sender.sendMessage(
                                     "Storage content has been printed to the server console"
                                 )
+                                return@executes 0
+                            })
+                            .build()
+                    )
+
+                event
+                    .registrar()
+                    ?.register(
+                        Commands.literal("DumpEventManager")
+                            .executes({ ctx1 ->
+                                newEventManager.debugDump()
                                 return@executes 0
                             })
                             .build()

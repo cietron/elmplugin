@@ -12,5 +12,6 @@ class onTick : Listener {
     @EventHandler
     fun onTick(event: ServerTickEndEvent) {
         Untitled.eventManager.dispatch(EventManager.EventType.onTick, LuaValue.NIL)
+        Untitled.newEventManager.emit(Untitled.newEventManager.factory.createOnTick())
     }
 }

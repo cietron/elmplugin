@@ -1,5 +1,6 @@
 package com.example.untitled.luaAdapter
 
+import com.example.untitled.Untitled
 import com.example.untitled.api.spell.SpellContext
 import com.example.untitled.apiImpl.Misc.VisualizeBoundingBoxImpl
 import com.example.untitled.apiImpl.capture.EntitiesInRotatedRectImpl
@@ -10,6 +11,7 @@ import com.example.untitled.apiImpl.spell.GetSpellCasterImpl
 import com.example.untitled.luaAdapter.capture.EntitiesInRotatedRectImplLua
 import com.example.untitled.luaAdapter.capture.EyesightEntityImplLua
 import com.example.untitled.luaAdapter.capture.RectangleImplLua
+import com.example.untitled.luaAdapter.event.GetEventManagerLua
 import com.example.untitled.luaAdapter.misc.VisualizeBoundingBoxImplLua
 import com.example.untitled.luaAdapter.spell.GetSpellCasterImplLua
 import org.bukkit.entity.Player
@@ -34,6 +36,7 @@ class PlayMod(val caster1: Player) : TwoArgFunction() {
         library.set("getBoundingBoxEntities", RectangleImplLua(RectangleImpl()))
         library.set("visualizeBox", VisualizeBoundingBoxImplLua(VisualizeBoundingBoxImpl()))
         library.set("getRotatedRect", EntitiesInRotatedRectImplLua(EntitiesInRotatedRectImpl()))
+        library.set("getEventManager", GetEventManagerLua(Untitled.newEventManager))
         env.set("newPmod", library)
         env["package"]["loaded"].set("newPmod", library)
         return library
