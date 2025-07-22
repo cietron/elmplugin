@@ -68,6 +68,7 @@ class ScriptManager() {
         spell(true),
         item(false),
         library(true),
+        startup(true),
         none(false),
     }
 }

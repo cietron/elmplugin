@@ -1,8 +1,8 @@
 package com.example.untitled.luaAdapter.capture
 
+import com.example.untitled.api.player.Player
 import com.example.untitled.apiImpl.capture.EyesightEntityImpl
 import com.example.untitled.apiImpl.entity.PlayerImpl
-import com.example.untitled.apiImpl.entity.SelectableEntityImpl
 import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
@@ -37,9 +37,12 @@ class EyesightEntityImplLua(val impl: EyesightEntityImpl) : TwoArgFunction() {
             return NIL
         }
 
-        return SelectableEntityImplLua().getTable(
-            LuaTable(),
-            SelectableEntityImplLua.Container(SelectableEntityImpl(result.uuid))
-        )
+        return when (result) {
+            is Player -> PlayerImplBaseLua().getTable(LuaTable(), PlayerImplBaseLua.Container(result))
+            else -> SelectableEntityImplLua().getTable(
+                LuaTable(),
+                SelectableEntityImplLua.Container(result)
+            )
+        }
     }
 }

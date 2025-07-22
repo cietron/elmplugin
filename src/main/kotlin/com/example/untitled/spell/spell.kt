@@ -3,6 +3,7 @@ package com.example.untitled.spell
 import com.example.untitled.Untitled
 import com.example.untitled.apiImpl.entity.PlayerImpl
 import com.example.untitled.luaAdapter.PlayMod
+import com.example.untitled.luaAdapter.SpellModule
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaApi.impl.CaptureModule
 import com.example.untitled.luaApi.impl.EntityModule
@@ -44,11 +45,12 @@ class spell {
 
             val env =
                 LuaGlobalFactory.defaultUserGlobal()
-                    .addLibrary(PlayerModule(event.player))
+                    .addLibrary(PlayerModule())
                     .addLibrary(CaptureModule())
                     .addLibrary(EntityModule())
                     .addLibrary(EventModule())
-                    .addLibrary(PlayMod(event.player))
+                    .addLibrary(PlayMod())
+                    .addLibrary(SpellModule(event.player))
                     .buildUserLibrary()
 
             val chunk = env.makeChunk(script)

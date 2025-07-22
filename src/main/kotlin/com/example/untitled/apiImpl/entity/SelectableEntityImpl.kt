@@ -15,9 +15,15 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
         const val DEFAULT_MANA = 100
     }
 
+    override val isPlayer = false
+
     override val position: Vector3d
         get() {
-            val loc = Bukkit.getEntity(uuid)!!.location
+            val ent = Bukkit.getEntity(uuid)
+
+            ent ?: return Vector3d(0.0, 0.0, 0.0)
+
+            val loc = ent.location
             return Vector3d(loc.x, loc.y, loc.z)
         }
 

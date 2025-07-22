@@ -4,8 +4,10 @@ import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
+import com.example.untitled.luaLoader.LoadStartupScripts
 import com.example.untitled.luaLoader.ScriptLoader
 import com.example.untitled.luaLoader.ScriptManager
+import com.example.untitled.player.BuiltinStatsDisplay
 import com.example.untitled.storage.SimpleStorage
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
@@ -36,6 +38,8 @@ class Untitled : JavaPlugin() {
         scriptManager.reload()
 
         registerCommand()
+        LoadStartupScripts.Companion.load()
+        BuiltinStatsDisplay.register()
     }
 
     fun registerCommand() {
@@ -61,7 +65,9 @@ class Untitled : JavaPlugin() {
                     ?.register(
                         Commands.literal("reloadScripts")
                             .executes { ctx ->
+                                Untitled.newEventManager.clear()
                                 scriptManager.reload()
+                                LoadStartupScripts.Companion.load()
                                 return@executes 0
                             }
                             .build()

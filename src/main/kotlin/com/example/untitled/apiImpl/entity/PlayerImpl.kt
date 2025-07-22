@@ -7,6 +7,8 @@ import java.util.*
 class PlayerImpl(override val name: String, override val uuid: UUID) :
     Player, SelectableEntityImpl(uuid) {
 
+    override val isPlayer = true
+
     override fun sendMessage(msg: String) {
         val player = Bukkit.getPlayer(uuid)
 

@@ -3,6 +3,7 @@ package com.example.untitled.apiImpl.capture
 import com.example.untitled.api.capture.EyesightEntity
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
+import com.example.untitled.apiImpl.entity.PlayerImpl
 import com.example.untitled.apiImpl.entity.SelectableEntityImpl
 import org.bukkit.Bukkit
 
@@ -16,6 +17,9 @@ class EyesightEntityImpl : EyesightEntity {
             return null
         }
 
-        return SelectableEntityImpl(hit.uniqueId)
+        return when (hit) {
+            is org.bukkit.entity.Player -> PlayerImpl(hit.name, hit.uniqueId)
+            else -> SelectableEntityImpl(hit.uniqueId)
+        }
     }
 }

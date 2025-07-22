@@ -6,4 +6,6 @@ interface EventManager {
     fun <T : Event> registerEvent(event: KClass<out T>, listener: EventListener<T>)
 
     fun <T : Event> emit(event: T)
+
+    fun clear()
 }

@@ -29,6 +29,7 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
             "normalizedFacingVector",
             Vector3dTable().getTable(LuaTable(), Vector3dTable.Container(impl.normalizedFacingVector))
         )
+        table.set("isPlayer", LuaValue.valueOf(impl.isPlayer))
 
         // Lua: entity:get_attribute("attr_name")
         table.set(

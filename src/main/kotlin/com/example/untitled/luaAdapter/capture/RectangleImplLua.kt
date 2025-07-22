@@ -1,8 +1,9 @@
 package com.example.untitled.luaAdapter.capture
 
+import com.example.untitled.api.player.Player
 import com.example.untitled.apiImpl.capture.RectangleImpl
-import com.example.untitled.apiImpl.entity.SelectableEntityImpl
 import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
+import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.Vector3dTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -34,10 +35,13 @@ class RectangleImplLua(val impl: RectangleImpl) : TwoArgFunction() {
             // Cast is safe if your impl always returns SelectableEntityImpl
             result.set(
                 i,
-                SelectableEntityImplLua().getTable(
-                    LuaTable(),
-                    SelectableEntityImplLua.Container(entity as SelectableEntityImpl)
-                )
+                when (entity) {
+                    is Player -> PlayerImplBaseLua().getTable(LuaTable(), PlayerImplBaseLua.Container(entity))
+                    else -> SelectableEntityImplLua().getTable(
+                        LuaTable(),
+                        SelectableEntityImplLua.Container(entity)
+                    )
+                }
             )
         }
         return result

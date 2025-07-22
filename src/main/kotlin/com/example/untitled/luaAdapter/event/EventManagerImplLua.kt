@@ -1,5 +1,6 @@
 package com.example.untitled.luaAdapter.event
 
+import com.example.untitled.Untitled
 import com.example.untitled.api.event.Event
 import com.example.untitled.api.event.EventListener
 import com.example.untitled.api.event.EventManager
@@ -88,8 +89,11 @@ class EventManagerImplLua(private val impl: EventManager) : BaseLuaTable<Unit>("
                             return result.toboolean()
                         }
 
+                        Untitled.instance.logger.warning("Event listener $luaFunction does not return boolean. Defaults to unsubscribe.")
                         return false
                     } catch (e: Exception) {
+                        Untitled.instance.logger.warning("Unsubscribing erroneous Event listener $luaFunction : $e.")
+                        e.printStackTrace()
                         return false
                     }
                 }

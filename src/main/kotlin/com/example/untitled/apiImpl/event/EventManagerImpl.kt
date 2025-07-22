@@ -29,6 +29,10 @@ class EventManagerImpl : EventManager {
         listeners[eventClass]?.removeAll(toRemove)
     }
 
+    override fun clear() {
+        this.listeners.clear()
+    }
+
     fun debugDump() {
         println("===== EventManager Debug Dump =====")
         listeners.forEach { (eventClass, eventListeners) ->

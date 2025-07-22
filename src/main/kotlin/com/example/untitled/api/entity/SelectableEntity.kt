@@ -7,6 +7,7 @@ interface SelectableEntity {
     val uuid: UUID
     val position: Vector3d
     val normalizedFacingVector: Vector3d
+    val isPlayer: Boolean
 
     fun getAttribute(attributeName: String): Any?
 

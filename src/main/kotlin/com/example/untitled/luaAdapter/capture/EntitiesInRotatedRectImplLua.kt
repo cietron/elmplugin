@@ -1,6 +1,7 @@
 package com.example.untitled.luaAdapter.capture
 
 import com.example.untitled.api.capture.EntitiesInRotatedRect
+import com.example.untitled.api.player.Player
 import com.example.untitled.apiImpl.entity.PlayerImpl
 import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
@@ -23,10 +24,13 @@ class EntitiesInRotatedRectImplLua(val impl: EntitiesInRotatedRect) : OneArgFunc
         val table = LuaTable()
         entities.forEachIndexed { i, entity ->
             table.set(
-                i + 1, SelectableEntityImplLua().getTable(
-                    LuaTable(),
-                    SelectableEntityImplLua.Container(entity)
-                )
+                i + 1, when (entity) {
+                    is Player -> PlayerImplBaseLua().getTable(LuaTable(), PlayerImplBaseLua.Container(entity))
+                    else -> SelectableEntityImplLua().getTable(
+                        LuaTable(),
+                        SelectableEntityImplLua.Container(entity)
+                    )
+                }
             )
         }
 

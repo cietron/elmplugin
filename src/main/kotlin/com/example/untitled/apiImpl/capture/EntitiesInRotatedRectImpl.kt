@@ -3,6 +3,7 @@ package com.example.untitled.apiImpl.capture
 import com.example.untitled.api.capture.EntitiesInRotatedRect
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
+import com.example.untitled.apiImpl.entity.PlayerImpl
 import com.example.untitled.apiImpl.entity.SelectableEntityImpl
 import org.bukkit.Bukkit
 import org.bukkit.Particle
@@ -84,7 +85,12 @@ class EntitiesInRotatedRectImpl : EntitiesInRotatedRect {
 
             // Check if point is within bounds
             abs(x) <= halfLength && abs(z) <= halfWidth
-        }.map { entity -> SelectableEntityImpl(entity.uniqueId) }
+        }.map { entity ->
+            return@map when (entity) {
+                is org.bukkit.entity.Player -> PlayerImpl(entity.name, entity.uniqueId)
+                else -> SelectableEntityImpl(entity.uniqueId)
+            }
+        }
     }
 
     private fun particleLine(start: Vector3d, end: Vector3d, space: Double) {

@@ -15,6 +15,7 @@ class ScriptLoader(val pluginDirectory: File) {
                         "spells" -> ScriptManager.ScriptType.spell
                         "items" -> ScriptManager.ScriptType.item
                         "lib" -> ScriptManager.ScriptType.library
+                        "startup" -> ScriptManager.ScriptType.startup
                         else -> ScriptManager.ScriptType.none
                     }
 
@@ -27,6 +28,7 @@ class ScriptLoader(val pluginDirectory: File) {
         val scriptDirectory = pluginDirectory.resolve("scripts")
         scriptDirectory.mkdirs()
         scriptDirectory.resolve("spells").mkdirs()
+        scriptDirectory.resolve("startup").mkdirs()
         scriptDirectory.resolve("items").mkdirs()
     }
 }
