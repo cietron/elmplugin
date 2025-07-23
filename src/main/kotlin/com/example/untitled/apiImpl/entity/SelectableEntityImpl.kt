@@ -3,6 +3,8 @@ package com.example.untitled.apiImpl.entity
 import com.example.untitled.Untitled
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.storage.SafeAttributeValue
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.sound.Sound
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.bukkit.util.Vector
@@ -131,4 +133,15 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
                 Math.cos(pitch) * Math.cos(yaw)
             )
         }
+
+    override fun emitSound(soundName: String, volume: Float, pitch: Float): Boolean {
+        val world = Bukkit.getServer().worlds.firstOrNull()
+        world ?: return false
+
+        val ent = Bukkit.getEntity(uuid)
+        ent ?: return false
+
+        world.playSound(Sound.sound(Key.key(soundName), Sound.Source.PLAYER, volume, pitch), ent)
+        return true
+    }
 }

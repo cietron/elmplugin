@@ -1,6 +1,7 @@
 package com.example.untitled
 
 import com.example.untitled.apiImpl.event.EventManagerImpl
+import com.example.untitled.apiImpl.spell.CooldownManager
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
@@ -25,6 +26,9 @@ class Untitled : JavaPlugin() {
         val eventManager = EventManager()
         val simpleStorage = SimpleStorage()
         val newEventManager = EventManagerImpl()
+
+        // temporary concrete class solution
+        val cooldownManager = CooldownManager(newEventManager)
     }
 
     override fun onEnable() {
@@ -65,9 +69,11 @@ class Untitled : JavaPlugin() {
                     ?.register(
                         Commands.literal("reloadScripts")
                             .executes { ctx ->
+                                cooldownManager.clean()
                                 Untitled.newEventManager.clear()
                                 scriptManager.reload()
                                 LoadStartupScripts.Companion.load()
+                                cooldownManager.registerEvent()
                                 return@executes 0
                             }
                             .build()

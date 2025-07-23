@@ -9,6 +9,20 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 
+/**
+ * @custom.LuaDoc ---@class selectable_entity
+ * @custom.LuaDoc ---@field uuid string
+ * @custom.LuaDoc ---@field health integer
+ * @custom.LuaDoc ---@field mana integer
+ * @custom.LuaDoc ---@field location Vector3d
+ * @custom.LuaDoc ---@field normalizedFacingVector Vector3d
+ * @custom.LuaDoc ---@field isPlayer boolean
+ * @custom.LuaDoc ---@field get_attribute fun(attr_name: string): any
+ * @custom.LuaDoc ---@field set_attribute fun(attr_name: string, value: any): boolean
+ * @custom.LuaDoc ---@field get_velocity fun(): Vector3d
+ * @custom.LuaDoc ---@field set_velocity fun(velocity: Vector3d): boolean
+ * @custom.LuaDoc ---@field emitSound fun(soundName: string, volume: number, pitch: number): boolean
+ */
 class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(CLASS_NAME, true) {
 
     companion object {
@@ -92,6 +106,8 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
                 }
             }
         )
+
+        table.set("emitSound", EntityEmitSoundLua(impl))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {

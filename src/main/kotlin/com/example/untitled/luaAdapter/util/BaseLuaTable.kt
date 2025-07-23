@@ -27,6 +27,10 @@ abstract class BaseLuaTable<T>(val className: String, val readOnly: Boolean) {
         }
     }
 
+    fun getNewTable(container: T): LuaTable {
+        return this.getTable(LuaTable(), container)
+    }
+
     abstract fun checkParseTable(table: LuaTable): Boolean
 
     protected abstract fun fromTable(table: LuaTable): T?

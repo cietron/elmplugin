@@ -6,4 +6,9 @@ interface Player : SelectableEntity {
     val name: String
 
     fun sendMessage(msg: String)
+
+    fun setCooldown(spellName: String, durationTicks: Int)
+
+    fun sendActionBarString(msg: String)
+
 }

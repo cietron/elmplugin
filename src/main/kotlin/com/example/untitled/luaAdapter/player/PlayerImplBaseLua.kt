@@ -31,6 +31,9 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
             }
 
         })
+
+        table.set("setCooldown", SetSpellCooldown(player))
+        table.set("sendActionbarMessage", SendActionbarMessage(player))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {

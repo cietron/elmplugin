@@ -2,6 +2,7 @@ package com.example.untitled.luaLoader
 
 import com.example.untitled.Untitled
 import com.example.untitled.luaAdapter.PlayMod
+import com.example.untitled.luaAdapter.ServerModule
 import com.example.untitled.luaApi.impl.PlayerModule
 
 class LoadStartupScripts {
@@ -12,6 +13,7 @@ class LoadStartupScripts {
                 LuaGlobalFactory.defaultUserGlobal()
                     .addLibrary(PlayMod())
                     .addLibrary(PlayerModule())
+                    .addLibrary(ServerModule())
                     .buildUserLibrary()
 
             Untitled.scriptManager.persistentStorage[ScriptManager.ScriptType.startup]?.forEach { (filename, content) ->

@@ -19,6 +19,8 @@ interface SelectableEntity {
 
     fun getVelocity(): Vector3d
 
+    fun emitSound(soundName: String, volume: Float, pitch: Float): Boolean
+
     var health: Int
     var mana: Int
 }
