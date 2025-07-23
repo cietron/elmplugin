@@ -1,6 +1,7 @@
 package com.example.untitled.api.entity
 
 import org.joml.Vector3d
+import org.joml.Vector4d
 import java.util.*
 
 interface SelectableEntity {
@@ -20,6 +21,8 @@ interface SelectableEntity {
     fun getVelocity(): Vector3d
 
     fun emitSound(soundName: String, volume: Float, pitch: Float): Boolean
+
+    fun easedMove(startPoint: Vector3d, endPoint: Vector3d, bezierPoints: Vector4d, durationTick: Int)
 
     var health: Int
     var mana: Int

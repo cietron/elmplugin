@@ -2,6 +2,7 @@ package com.example.untitled.apiImpl.entity
 
 import com.example.untitled.Untitled
 import com.example.untitled.api.entity.SelectableEntity
+import com.example.untitled.api.event.BuiltinEvents
 import com.example.untitled.storage.SafeAttributeValue
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.bukkit.util.Vector
 import org.joml.Vector3d
+import org.joml.Vector4d
 import java.util.*
 
 open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
@@ -143,5 +145,42 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
 
         world.playSound(Sound.sound(Key.key(soundName), Sound.Source.PLAYER, volume, pitch), ent)
         return true
+    }
+
+    override fun easedMove(
+        startPoint: Vector3d,
+        endPoint: Vector3d,
+        bezierPoints: Vector4d,
+        durationTick: Int
+    ) {
+
+        val ent = Bukkit.getServer().getEntity(uuid) as LivingEntity?
+        ent ?: return
+
+        val easing = CubicBezierEasing(bezierPoints)
+        var counter = 0
+
+        val startPointCopy = Vector3d(startPoint)
+        val endPointCopy = Vector3d(endPoint)
+
+        Untitled.newEventManager.registerEvent(BuiltinEvents.Companion.OnTick::class, {
+            if (counter >= durationTick) {
+                ent.velocity = Vector(0, 0, 0)
+                return@registerEvent false
+            }
+
+            val currentT = counter / durationTick.toDouble()
+            val nextT = ((counter + 1).coerceAtMost(durationTick - 1)) / durationTick.toDouble()
+
+            val posNow = Vector3d(startPointCopy).lerp(endPointCopy, easing.ease(currentT))
+            val posNext = Vector3d(startPointCopy).lerp(endPointCopy, easing.ease(nextT))
+
+            val velocity = posNext.sub(posNow)
+
+            ent.velocity = Vector(velocity.x, velocity.y, velocity.z)
+
+            counter++
+            return@registerEvent true
+        })
     }
 }

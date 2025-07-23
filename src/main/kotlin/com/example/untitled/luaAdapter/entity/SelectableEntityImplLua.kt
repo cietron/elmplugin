@@ -14,14 +14,16 @@ import org.luaj.vm2.lib.ZeroArgFunction
  * @custom.LuaDoc ---@field uuid string
  * @custom.LuaDoc ---@field health integer
  * @custom.LuaDoc ---@field mana integer
- * @custom.LuaDoc ---@field location Vector3d
- * @custom.LuaDoc ---@field normalizedFacingVector Vector3d
+ * @custom.LuaDoc ---@field location vector3d
+ * @custom.LuaDoc ---@field normalizedFacingVector vector3d
  * @custom.LuaDoc ---@field isPlayer boolean
  * @custom.LuaDoc ---@field get_attribute fun(attr_name: string): any
  * @custom.LuaDoc ---@field set_attribute fun(attr_name: string, value: any): boolean
- * @custom.LuaDoc ---@field get_velocity fun(): Vector3d
- * @custom.LuaDoc ---@field set_velocity fun(velocity: Vector3d): boolean
+ * @custom.LuaDoc ---@field get_velocity fun(): vector3d
+ * @custom.LuaDoc ---@field set_velocity fun(velocity: vector3d): boolean
  * @custom.LuaDoc ---@field emitSound fun(soundName: string, volume: number, pitch: number): boolean
+ * @custom.LuaDoc ---@field easedMove fun(startPoint: vector3d, endPoint: vector3d, bezierPoints: vector4d, durationTick: integer)
+ *
  */
 class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(CLASS_NAME, true) {
 
@@ -108,6 +110,7 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
         )
 
         table.set("emitSound", EntityEmitSoundLua(impl))
+        table.set("easedMove", EntityEaseMoveLua(impl))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {
