@@ -1,7 +1,7 @@
 package com.example.untitled.luaAdapter
 
 import com.example.untitled.api.spell.SpellContext
-import com.example.untitled.apiImpl.entity.PlayerImpl
+import com.example.untitled.apiImpl.entity.EntityFactory
 import com.example.untitled.apiImpl.spell.GetSpellCasterImpl
 import com.example.untitled.luaAdapter.spell.GetSpellCasterImplLua
 import org.bukkit.entity.Player
@@ -17,7 +17,7 @@ class SpellModule(val caster1: Player) : TwoArgFunction() {
                 GetSpellCasterImpl(
                     object : SpellContext {
                         override val caster: com.example.untitled.api.player.Player
-                            get() = PlayerImpl(caster1.name, caster1.uniqueId)
+                            get() = EntityFactory.fromBukkitPlayer(caster1)
                     }
                 )
             ),

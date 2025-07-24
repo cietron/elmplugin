@@ -2,7 +2,6 @@ package com.example.untitled.spell
 
 import com.example.untitled.Untitled
 import com.example.untitled.apiImpl.entity.EntityFactory
-import com.example.untitled.apiImpl.entity.PlayerImpl
 import com.example.untitled.luaAdapter.PlayMod
 import com.example.untitled.luaAdapter.SpellModule
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
@@ -14,17 +13,18 @@ import com.example.untitled.luaLoader.LuaGlobalFactory
 import com.example.untitled.luaLoader.ScriptManager
 import com.example.untitled.player.PlayerMessenger
 import net.kyori.adventure.text.TextComponent
-import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 
 object spell {
-    fun execute(event: PlayerInteractEvent) {
+    fun execute(spellName: String, bukkitPlayer: Player) {
 
-        val spellObject = this.getScriptFromItemName(event)
+        val spellObject = this.getScriptFromItemName(spellName)
         spellObject ?: return
 
-        val player = EntityFactory.fromBukkitPlayer(event.player)
+        val player = EntityFactory.fromBukkitPlayer(bukkitPlayer)
 
         if (Untitled.cooldownManager.isCoolingDown(player, spellObject.name)) {
             val remainingTicks = Untitled.cooldownManager.getRemainingTicks(player, spellObject.name)
@@ -32,7 +32,7 @@ object spell {
             return
         }
 
-        val env = this.buildLuaEnvironment(event)
+        val env = this.buildLuaEnvironment(bukkitPlayer)
         val chunk = env.makeChunk(spellObject.content)
 
         chunk.call()
@@ -51,7 +51,7 @@ object spell {
 
         val LuaPlayer = PlayerImplBaseLua().getTable(
             LuaTable(),
-            PlayerImplBaseLua.Container(PlayerImpl(event.player.name, event.player.uniqueId))
+            PlayerImplBaseLua.Container(EntityFactory.fromBukkitPlayer(bukkitPlayer))
         )
 
         val shouldExecute = this.check_requirement(requirements, LuaPlayer, spellObject.name)
@@ -65,7 +65,7 @@ object spell {
         Untitled.cooldownManager.store(player, spellObject.name, cooldown)
     }
 
-    private fun buildLuaEnvironment(event: PlayerInteractEvent): LuaGlobalFactory {
+    private fun buildLuaEnvironment(bukkitPlayer: Player): LuaGlobalFactory {
 
         return LuaGlobalFactory.defaultUserGlobal()
             .addLibrary(PlayerModule())
@@ -73,7 +73,7 @@ object spell {
             .addLibrary(EntityModule())
             .addLibrary(EventModule())
             .addLibrary(PlayMod())
-            .addLibrary(SpellModule(event.player))
+            .addLibrary(SpellModule(bukkitPlayer))
             .buildUserLibrary()
     }
 
@@ -93,26 +93,29 @@ object spell {
         return requirementResult.toboolean()
     }
 
-    private fun getScriptFromItemName(event: PlayerInteractEvent): SpellObject? {
-        val displayName = event.item?.itemMeta?.displayName()
-
-        if (displayName == null || displayName !is TextComponent) {
-            return null
-        }
-        val spellname = displayName.content()
-
+    private fun getScriptFromItemName(spellName: String): SpellObject? {
         if (
             Untitled.scriptManager.persistentStorage[ScriptManager.ScriptType.spell]!![
-                spellname] == null
+                spellName] == null
         ) {
             return null
         }
 
         val script =
             Untitled.scriptManager.persistentStorage[ScriptManager.ScriptType.spell]!![
-                spellname]!!
+                spellName]!!
 
-        return SpellObject(spellname, script)
+        return SpellObject(spellName, script)
+    }
+
+    fun parseSpellname(itemStack: ItemStack): String? {
+        val displayName = itemStack.itemMeta?.displayName()
+
+        if (displayName == null || displayName !is TextComponent) {
+            return null
+        }
+        val spellname = displayName.content()
+        return spellname
     }
 
     private data class SpellObject(val name: String, val content: String)
