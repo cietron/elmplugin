@@ -1,4 +1,4 @@
-package com.example.untitled.luaAdapter
+package com.example.untitled.luaLoader.luaModules
 
 import com.example.untitled.apiImpl.server.ServerImpl
 import com.example.untitled.luaAdapter.server.ServerClass

@@ -37,4 +37,17 @@ class StorageImpl : UnsafeStorage {
         this.storageSpace.clear()
         this.unsafeStorageSpace.clear()
     }
+
+    fun debugDump() {
+        println("=== StorageImpl Debug Dump ===")
+        println("storageSpace:")
+        for ((key, value) in storageSpace) {
+            println("  [$key] = $value")
+        }
+        println("unsafeStorageSpace:")
+        for ((key, value) in unsafeStorageSpace) {
+            println("  [$key] = $value")
+        }
+        println("=== End Debug Dump ===")
+    }
 }

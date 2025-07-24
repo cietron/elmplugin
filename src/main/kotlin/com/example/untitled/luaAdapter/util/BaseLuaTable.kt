@@ -4,7 +4,8 @@ import com.example.untitled.luaLoader.ReadOnlyLuaTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 
-abstract class BaseLuaTable<T>(val className: String, val readOnly: Boolean) {
+abstract class BaseLuaTable<T>(_className: String, val readOnly: Boolean) {
+    val className: String = _className
 
     protected abstract fun modifyTable(table: LuaTable, container: T)
 

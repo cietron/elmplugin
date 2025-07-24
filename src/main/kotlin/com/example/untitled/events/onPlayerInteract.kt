@@ -1,5 +1,6 @@
 package com.example.untitled.events
 
+import com.example.untitled.apiImpl.entity.EntityFactory
 import com.example.untitled.spell.spell
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -28,7 +29,7 @@ class onPlayerInteract : Listener {
         }
         val parsed = spell.parseSpellname(itemstack) ?: return
 
-        spell.execute(parsed, event.player)
+        spell.tryExecute(parsed, EntityFactory.fromBukkitPlayer(event.player))
 
         event.isCancelled = true
     }
@@ -51,7 +52,7 @@ class onPlayerInteract : Listener {
 
         val spellName = spell.parseSpellname(itemstack) ?: return
 
-        spell.execute(spellName, player)
+        spell.tryExecute(spellName, EntityFactory.fromBukkitPlayer(player))
 
         event.isCancelled = true
     }

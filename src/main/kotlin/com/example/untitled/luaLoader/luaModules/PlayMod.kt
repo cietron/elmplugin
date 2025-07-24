@@ -1,4 +1,4 @@
-package com.example.untitled.luaAdapter
+package com.example.untitled.luaLoader.luaModules
 
 import com.example.untitled.Untitled
 import com.example.untitled.apiImpl.Misc.VisualizeBoundingBoxImpl
@@ -21,7 +21,7 @@ class PlayMod() : TwoArgFunction() {
         library.set("getBoundingBoxEntities", RectangleImplLua(RectangleImpl()))
         library.set("visualizeBox", VisualizeBoundingBoxImplLua(VisualizeBoundingBoxImpl()))
         library.set("getRotatedRect", EntitiesInRotatedRectImplLua(EntitiesInRotatedRectImpl()))
-        library.set("getEventManager", GetEventManagerLua(Untitled.newEventManager))
+        library.set("getEventManager", GetEventManagerLua(Untitled.Companion.newEventManager))
         env.set("newPmod", library)
         env["package"]["loaded"].set("newPmod", library)
         return library

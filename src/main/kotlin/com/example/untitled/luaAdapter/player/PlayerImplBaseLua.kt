@@ -37,9 +37,9 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {
-        println(isInstanceOf(table, CLASS_NAME))
+        println(isInstanceOf(table, className))
         println(table.get("name").isstring())
-        return (isInstanceOf(table, CLASS_NAME) && table.get("name").isstring())
+        return (isInstanceOf(table, className) && table.get("name").isstring())
     }
 
     override fun fromTable(table: LuaTable): Container? {

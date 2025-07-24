@@ -2,6 +2,7 @@ package com.example.untitled
 
 import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.apiImpl.spell.CooldownManager
+import com.example.untitled.apiImpl.spell.SpellManagerImpl
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
@@ -10,6 +11,7 @@ import com.example.untitled.luaLoader.ScriptLoader
 import com.example.untitled.luaLoader.ScriptManager
 import com.example.untitled.player.BuiltinStatsDisplay
 import com.example.untitled.storage.SimpleStorage
+import com.example.untitled.storage.StorageImpl
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.java.JavaPlugin
@@ -29,6 +31,10 @@ class Untitled : JavaPlugin() {
 
         // temporary concrete class solution
         val cooldownManager = CooldownManager(newEventManager)
+
+        val storageManager = StorageImpl()
+        val spellManager = SpellManagerImpl(storageManager)
+
     }
 
     override fun onEnable() {
@@ -71,6 +77,7 @@ class Untitled : JavaPlugin() {
                             .executes { ctx ->
                                 cooldownManager.clean()
                                 Untitled.newEventManager.clear()
+                                storageManager.clear()
                                 scriptManager.reload()
                                 LoadStartupScripts.Companion.load()
                                 cooldownManager.registerEvent()
@@ -85,6 +92,7 @@ class Untitled : JavaPlugin() {
                         Commands.literal("DumpStorage")
                             .executes({ ctx1 ->
                                 simpleStorage.debugDump()
+                                storageManager.debugDump()
                                 ctx1.source.sender.sendMessage(
                                     "Storage content has been printed to the server console"
                                 )
