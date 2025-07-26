@@ -17,6 +17,7 @@ class DynamicLuaEventFactory : LuaEventFactory {
     init {
         eventClasses["on_tick"] = BuiltinEvents.OnTick::class
         eventClasses["onArrowHitEntity"] = BuiltinEvents.OnArrowHitEntity::class
+        eventClasses["onFireballHitEntity"] = BuiltinEvents.OnFireballHitEntity::class
     }
 
     companion object {
@@ -25,6 +26,9 @@ class DynamicLuaEventFactory : LuaEventFactory {
                 is BuiltinEvents.OnTick -> LuaValue.NIL
                 is BuiltinEvents.OnArrowHitEntity -> OnArrowHitEntityEventLuaClass().getNewTable(
                     OnArrowHitEntityEventLuaClass.Container(event)
+                )
+                is BuiltinEvents.OnFireballHitEntity -> OnFireballHitEntityLuaClass().getNewTable(
+                    OnFireballHitEntityLuaClass.Container(event)
                 )
                 is LuaUserEvent -> event.data
                 else -> LuaValue.NIL

@@ -3,6 +3,7 @@ package com.example.untitled
 import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.apiImpl.spell.CooldownManager
 import com.example.untitled.apiImpl.spell.SpellManagerImpl
+import com.example.untitled.events.EntityExplode
 import com.example.untitled.events.Projectile
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
@@ -42,9 +43,7 @@ class Untitled : JavaPlugin() {
         // Plugin startup logic
         instance = this
 
-        server.pluginManager.registerEvents(onPlayerInteract(), this)
-        server.pluginManager.registerEvents(onTick(), this)
-        server.pluginManager.registerEvents(Projectile(), this)
+        this.registerEvents()
 
         scriptManager.loader = ScriptLoader(dataFolder)
         scriptManager.reload()
@@ -52,6 +51,13 @@ class Untitled : JavaPlugin() {
         registerCommand()
         LoadStartupScripts.Companion.load()
         BuiltinStatsDisplay.register()
+    }
+
+    fun registerEvents() {
+        server.pluginManager.registerEvents(onPlayerInteract(), this)
+        server.pluginManager.registerEvents(onTick(), this)
+        server.pluginManager.registerEvents(Projectile(), this)
+        server.pluginManager.registerEvents(EntityExplode(), this)
     }
 
     fun registerCommand() {

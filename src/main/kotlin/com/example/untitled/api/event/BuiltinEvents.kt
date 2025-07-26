@@ -10,4 +10,5 @@ object BuiltinEvents {
     class OnTick : Event {}
     class OnArrowHitEntity(val arrowUUID: UUID, val victim: SelectableEntity) : Event
     class OnArrowHitBlock(val arrowUUID: UUID) : Event
+    class OnFireballHitEntity(val fireballUUID: UUID, val victim: SelectableEntity) : Event
 }
