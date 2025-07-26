@@ -33,7 +33,7 @@ class CooldownManager(private val eventManager: EventManager) {
     }
 
     fun registerEvent() {
-        eventManager.registerEvent(BuiltinEvents.Companion.OnTick::class, {
+        eventManager.registerEvent(BuiltinEvents.OnTick::class, {
             this.currentTick++
             return@registerEvent true // keep listening
         })

@@ -1,11 +1,13 @@
 package com.example.untitled.luaAdapter.player
 
 import com.example.untitled.api.player.Player
+import com.example.untitled.apiImpl.entity.EntityFactory
 import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
+import java.util.*
 
 class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, true) {
 
@@ -37,13 +39,27 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {
-        println(isInstanceOf(table, className))
-        println(table.get("name").isstring())
-        return (isInstanceOf(table, className) && table.get("name").isstring())
+        if (table.get("uuid") == null || !table.get("uuid").isstring()) {
+            return false
+        }
+        val uuidString = table.get("uuid").tojstring()
+        try {
+            UUID.fromString(uuidString)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            return false
+        }
+        return true
     }
 
     override fun fromTable(table: LuaTable): Container? {
-        TODO("not implemented")
+        val uuid = UUID.fromString(table.get("uuid").tojstring())
+        val ent = EntityFactory.fromEntityUUID(uuid)
+
+        return when (ent) {
+            is Player -> Container(ent)
+            else -> null
+        }
     }
 
     data class Container(val player: Player)

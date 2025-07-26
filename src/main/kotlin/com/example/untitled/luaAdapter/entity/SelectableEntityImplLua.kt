@@ -1,6 +1,7 @@
 package com.example.untitled.luaAdapter.entity
 
 import com.example.untitled.api.entity.SelectableEntity
+import com.example.untitled.apiImpl.entity.EntityFactory
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import com.example.untitled.luaAdapter.util.Vector3dTable
 import org.luaj.vm2.LuaTable
@@ -8,6 +9,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import java.util.*
 
 /**
  * @custom.LuaDoc ---@class selectable_entity
@@ -114,11 +116,25 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {
-        TODO("Not yet implemented")
+        if (table.get("uuid") == null || !table.get("uuid").isstring()) {
+            return false
+        }
+        val uuidString = table.get("uuid").tojstring()
+        try {
+            UUID.fromString(uuidString)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            return false
+        }
+        return true
     }
 
     override fun fromTable(table: LuaTable): Container? {
-        TODO("Not yet implemented")
+        val uuid = UUID.fromString(table.get("uuid").tojstring())
+        val ent = EntityFactory.fromEntityUUID(uuid)
+
+        ent ?: return null
+        return Container(ent)
     }
 
     data class Container(val entity: SelectableEntity)

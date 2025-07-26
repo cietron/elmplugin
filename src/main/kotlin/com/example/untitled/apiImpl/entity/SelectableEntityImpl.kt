@@ -163,7 +163,7 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
         val startPointCopy = Vector3d(startPoint)
         val endPointCopy = Vector3d(endPoint)
 
-        Untitled.newEventManager.registerEvent(BuiltinEvents.Companion.OnTick::class, {
+        Untitled.newEventManager.registerEvent(BuiltinEvents.OnTick::class, {
             if (counter >= durationTick) {
                 ent.velocity = Vector(0, 0, 0)
                 return@registerEvent false

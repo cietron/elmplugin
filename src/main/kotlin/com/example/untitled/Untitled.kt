@@ -3,6 +3,7 @@ package com.example.untitled
 import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.apiImpl.spell.CooldownManager
 import com.example.untitled.apiImpl.spell.SpellManagerImpl
+import com.example.untitled.events.Projectile
 import com.example.untitled.events.onPlayerInteract
 import com.example.untitled.events.onTick
 import com.example.untitled.luaLoader.EventManager
@@ -43,6 +44,7 @@ class Untitled : JavaPlugin() {
 
         server.pluginManager.registerEvents(onPlayerInteract(), this)
         server.pluginManager.registerEvents(onTick(), this)
+        server.pluginManager.registerEvents(Projectile(), this)
 
         scriptManager.loader = ScriptLoader(dataFolder)
         scriptManager.reload()

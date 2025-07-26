@@ -15,13 +15,17 @@ class DynamicLuaEventFactory : LuaEventFactory {
     private val eventClasses = HashMap<String, KClass<out Event>>()
 
     init {
-        eventClasses["on_tick"] = BuiltinEvents.Companion.OnTick::class
+        eventClasses["on_tick"] = BuiltinEvents.OnTick::class
+        eventClasses["onArrowHitEntity"] = BuiltinEvents.OnArrowHitEntity::class
     }
 
     companion object {
         fun eventToLuaValue(event: Event): LuaValue {
             return when (event) {
-                is BuiltinEvents.Companion.OnTick -> LuaValue.NIL
+                is BuiltinEvents.OnTick -> LuaValue.NIL
+                is BuiltinEvents.OnArrowHitEntity -> OnArrowHitEntityEventLuaClass().getNewTable(
+                    OnArrowHitEntityEventLuaClass.Container(event)
+                )
                 is LuaUserEvent -> event.data
                 else -> LuaValue.NIL
             }
