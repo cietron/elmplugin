@@ -1,5 +1,6 @@
 package com.example.untitled.apiImpl.entity
 
+import com.example.untitled.Untitled
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
 import org.bukkit.Bukkit
@@ -10,11 +11,22 @@ import java.util.*
 
 object EntityFactory {
     fun fromBukkitPlayer(bukkitPlayer: org.bukkit.entity.Player): Player {
-        return PlayerImpl(bukkitPlayer.name, bukkitPlayer.uniqueId)
+        return PlayerImpl(
+            bukkitPlayer.name,
+            bukkitPlayer.uniqueId,
+            Untitled.storageManager,
+            Untitled.newEventManager,
+            Untitled.attributeManager
+        )
     }
 
     fun fromBukkitLivingEntity(entity: LivingEntity): SelectableEntity {
-        return SelectableEntityImpl(entity.uniqueId)
+        return SelectableEntityImpl(
+            entity.uniqueId,
+            Untitled.storageManager,
+            Untitled.newEventManager,
+            Untitled.attributeManager
+        )
     }
 
     fun fromEntity(entity: Entity): SelectableEntity? {

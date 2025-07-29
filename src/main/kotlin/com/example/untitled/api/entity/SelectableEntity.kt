@@ -10,9 +10,13 @@ interface SelectableEntity {
     val normalizedFacingVector: Vector3d
     val isPlayer: Boolean
 
-    fun getAttribute(attributeName: String): Any?
+    fun getAttribute(): List<Map.Entry<String, Double>>?
 
-    fun setAttribute(attributeName: String, value: Any): Boolean
+    fun setAttribute(attributeName: String, value: Double): Boolean
+
+    fun getTrackedValue(name: String): Double?
+
+    fun setTrackedValue(name: String, value: Double): Boolean
 
     fun kill()
 

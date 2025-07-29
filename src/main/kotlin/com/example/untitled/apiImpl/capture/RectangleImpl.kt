@@ -2,10 +2,8 @@ package com.example.untitled.apiImpl.capture
 
 import com.example.untitled.api.capture.Rectangle
 import com.example.untitled.api.entity.SelectableEntity
-import com.example.untitled.apiImpl.entity.PlayerImpl
-import com.example.untitled.apiImpl.entity.SelectableEntityImpl
+import com.example.untitled.apiImpl.entity.EntityFactory
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
 import org.joml.Vector3d
 
@@ -26,11 +24,8 @@ class RectangleImpl : Rectangle {
         println(boundingBox)
 
         return world.getNearbyEntities(boundingBox).map {
-            return@map when (it) {
-                is Player -> PlayerImpl(it.name, it.uniqueId)
-                else -> SelectableEntityImpl(it.uniqueId)
-            }
-        }
+            return@map EntityFactory.fromEntity(it)
+        }.filterNotNull()
 
     }
 }

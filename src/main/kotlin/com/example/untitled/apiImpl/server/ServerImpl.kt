@@ -2,7 +2,7 @@ package com.example.untitled.apiImpl.server
 
 import com.example.untitled.api.player.Player
 import com.example.untitled.api.server.Server
-import com.example.untitled.apiImpl.entity.PlayerImpl
+import com.example.untitled.apiImpl.entity.EntityFactory
 import com.google.common.collect.ImmutableList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
@@ -13,7 +13,7 @@ class ServerImpl : Server {
     override fun getAllPlayers(): Collection<Player> {
         val BukkitPlayers = ImmutableList.copyOf(Bukkit.getServer().onlinePlayers.filterNotNull())
 
-        return BukkitPlayers.map { player -> PlayerImpl(player.name, player.uniqueId) }
+        return BukkitPlayers.map { player -> EntityFactory.fromBukkitPlayer(player) }
     }
 
     override fun playSound(

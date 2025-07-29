@@ -2,7 +2,7 @@ package com.example.untitled.luaAdapter.capture
 
 import com.example.untitled.api.player.Player
 import com.example.untitled.apiImpl.capture.RectangleImpl
-import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.Vector3dTable
 import org.luaj.vm2.LuaTable

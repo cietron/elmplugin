@@ -2,7 +2,7 @@ package com.example.untitled.luaAdapter.event
 
 import com.example.untitled.api.event.BuiltinEvents
 import com.example.untitled.api.player.Player
-import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import org.luaj.vm2.LuaTable
@@ -36,5 +36,5 @@ class OnArrowHitEntityEventLuaClass :
         TODO("Not yet implemented")
     }
 
-    data class Container(val event: BuiltinEvents.OnArrowHitEntity) {}
+    data class Container(val event: BuiltinEvents.OnArrowHitEntity)
 }

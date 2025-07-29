@@ -1,7 +1,7 @@
 package com.example.untitled.player
 
 import com.example.untitled.Untitled
-import com.example.untitled.apiImpl.entity.PlayerImpl
+import com.example.untitled.apiImpl.entity.EntityFactory
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 
@@ -12,7 +12,7 @@ class BuiltinStatsDisplay {
             Bukkit.getServer().scheduler.runTaskTimer(Untitled.instance, Runnable {
                 Bukkit.getOnlinePlayers().forEach { player ->
                     player?.let {
-                        val playerInstance = PlayerImpl(player.name, player.uniqueId)
+                        val playerInstance = EntityFactory.fromBukkitPlayer(player)
                         player.sendActionBar(Component.text("Health: ${playerInstance.health}, Mana: ${playerInstance.mana}"))
                     }
                 }

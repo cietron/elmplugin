@@ -1,6 +1,7 @@
 package com.example.untitled.luaAdapter.entity
 
 import com.example.untitled.api.entity.HomingArrow
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.util.Vector3dTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -28,6 +29,6 @@ class HomingArrowLua(private val impl: HomingArrow) : ThreeArgFunction() {
         val parsedSpeed = speed.todouble()
 
         val uuid = impl.spawn(victimContainer.entity, spawnVector, parsedSpeed)
-        return if (uuid != null) LuaValue.valueOf(uuid.toString()) else LuaValue.NIL
+        return if (uuid != null) valueOf(uuid.toString()) else NIL
     }
 }

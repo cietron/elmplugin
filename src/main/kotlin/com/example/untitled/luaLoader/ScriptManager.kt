@@ -69,6 +69,7 @@ class ScriptManager() {
         item(false),
         library(true),
         startup(true),
+        server(true),
         none(false),
     }
 }

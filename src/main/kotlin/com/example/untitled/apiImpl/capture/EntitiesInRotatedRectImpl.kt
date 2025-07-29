@@ -3,8 +3,7 @@ package com.example.untitled.apiImpl.capture
 import com.example.untitled.api.capture.EntitiesInRotatedRect
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
-import com.example.untitled.apiImpl.entity.PlayerImpl
-import com.example.untitled.apiImpl.entity.SelectableEntityImpl
+import com.example.untitled.apiImpl.entity.EntityFactory
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.joml.Vector3d
@@ -50,8 +49,8 @@ class EntitiesInRotatedRectImpl : EntitiesInRotatedRect {
 
         // Rotate and translate corners to world space
         val worldCorners = localCorners.map { local ->
-            val x = local.x * kotlin.math.cos(yaw) - local.z * kotlin.math.sin(yaw)
-            val z = local.x * kotlin.math.sin(yaw) + local.z * kotlin.math.cos(yaw)
+            val x = local.x * cos(yaw) - local.z * sin(yaw)
+            val z = local.x * sin(yaw) + local.z * cos(yaw)
             val y = local.y
             val worldVec = center.clone().add(org.bukkit.util.Vector(x, y, z))
             Vector3d(worldVec.x, worldVec.y, worldVec.z)
@@ -86,11 +85,8 @@ class EntitiesInRotatedRectImpl : EntitiesInRotatedRect {
             // Check if point is within bounds
             abs(x) <= halfLength && abs(z) <= halfWidth
         }.map { entity ->
-            return@map when (entity) {
-                is org.bukkit.entity.Player -> PlayerImpl(entity.name, entity.uniqueId)
-                else -> SelectableEntityImpl(entity.uniqueId)
-            }
-        }
+            return@map EntityFactory.fromEntity(entity)
+        }.filterNotNull()
     }
 
     private fun particleLine(start: Vector3d, end: Vector3d, space: Double) {

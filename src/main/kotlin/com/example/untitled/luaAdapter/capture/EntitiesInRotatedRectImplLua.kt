@@ -2,14 +2,12 @@ package com.example.untitled.luaAdapter.capture
 
 import com.example.untitled.api.capture.EntitiesInRotatedRect
 import com.example.untitled.api.player.Player
-import com.example.untitled.apiImpl.entity.PlayerImpl
-import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
-import java.util.*
 
 class EntitiesInRotatedRectImplLua(val impl: EntitiesInRotatedRect) : OneArgFunction() {
     override fun call(arg: LuaValue?): LuaValue? {
@@ -18,7 +16,10 @@ class EntitiesInRotatedRectImplLua(val impl: EntitiesInRotatedRect) : OneArgFunc
             return NIL
         }
 
-        val player = PlayerImpl(arg.get("name").tojstring(), UUID.fromString(arg.get("uuid").tojstring()))
+        val luaPlayer = PlayerImplBaseLua().fromLuaValue(arg)
+        luaPlayer ?: return error("Player not found")
+
+        val player = luaPlayer.player
 
         val entities = impl.get(player)
         val table = LuaTable()

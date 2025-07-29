@@ -1,9 +1,11 @@
 package com.example.untitled.apiImpl.entity
 
-import com.example.untitled.Untitled
+import com.example.untitled.api.attribute.AttributeManager
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.event.BuiltinEvents
-import com.example.untitled.storage.SafeAttributeValue
+import com.example.untitled.api.event.EventManager
+import com.example.untitled.storage.Storage
+import com.example.untitled.storage.StorageValue
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import org.bukkit.Bukkit
@@ -13,10 +15,15 @@ import org.joml.Vector3d
 import org.joml.Vector4d
 import java.util.*
 
-open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
+open class SelectableEntityImpl(
+    override val uuid: UUID,
+    val storage: Storage,
+    val eventManager: EventManager,
+    val attributeManager: AttributeManager
+) : SelectableEntity {
     companion object {
-        const val DEFAULT_HEALTH = 20
-        const val DEFAULT_MANA = 100
+        const val DEFAULT_HEALTH = 20.0
+        const val DEFAULT_MANA = 100.0
     }
 
     override val isPlayer = false
@@ -31,22 +38,52 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
             return Vector3d(loc.x, loc.y, loc.z)
         }
 
-    override fun getAttribute(attributeName: String): SafeAttributeValue? {
-        val key = "$uuid#$attributeName"
-        return Untitled.simpleStorage.retrieve(key)
+    override fun getAttribute(): List<Map.Entry<String, Double>>? {
+        val rawEntity = Bukkit.getEntity(uuid)
+        val ent = when (rawEntity) {
+            is LivingEntity -> rawEntity
+            else -> return null
+        }
+
+        return attributeManager.get(ent)
     }
 
-    override fun setAttribute(attributeName: String, value: Any): Boolean {
-        val key = "$uuid#$attributeName"
-        val results = Untitled.simpleStorage.store(key, value)
-        this.postAttributeChange(attributeName)
-        return results
+    override fun setAttribute(attributeName: String, value: Double): Boolean {
+        val rawEntity = Bukkit.getEntity(uuid)
+        val ent = when (rawEntity) {
+            is LivingEntity -> rawEntity
+            else -> return false
+        }
+
+        attributeManager.notifyChange(ent, attributeName, value)
+        return true
     }
 
     private fun postAttributeChange(attributeName: String) {
-        if (attributeName == "health" && this.health <= 0) {
+    }
+
+    override fun getTrackedValue(name: String): Double? {
+        val key = "$uuid#trackedValue#$name"
+        val value = storage.retrieve(key)
+        return when (value) {
+            is StorageValue.DoubleValue -> value.value
+            is StorageValue.IntValue -> value.value.toDouble()
+            is StorageValue.StringValue -> throw AssertionError("Stored tracked value unexcepted type string. Requested $uuid: $name. Got $value")
+            null -> null
+        }
+    }
+
+    override fun setTrackedValue(name: String, value: Double): Boolean {
+        val key = "$uuid#trackedValue#$name"
+        val results = storage.store(key, StorageValue.DoubleValue(value))
+        this.postTrackedValueChange(name)
+        return results
+    }
+
+    private fun postTrackedValueChange(name: String) {
+        if (name == "health" && this.health <= 0) {
             this.kill()
-            this.health = DEFAULT_HEALTH
+            this.health = DEFAULT_HEALTH.toInt()
         }
     }
 
@@ -80,45 +117,34 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
 
     override var health: Int
         get() {
-            val key = "$uuid#health"
+            val key = "health"
 
-            if (Untitled.simpleStorage.retrieve(key) == null) {
-                Untitled.simpleStorage.store(key, DEFAULT_HEALTH)
+            if (this.getTrackedValue(key) == null) {
+                this.setTrackedValue(key, DEFAULT_HEALTH)
             }
 
-            val value = Untitled.simpleStorage.retrieve(key)
-            return when (value) {
-                is SafeAttributeValue.DoubleValue -> null
-                is SafeAttributeValue.IntValue -> value.value
-                is SafeAttributeValue.StringValue -> null
-                null -> null
-            }!!
+            val value = getTrackedValue(key)!!
+            return value.toInt()
         }
         set(value) {
-            val key = "$uuid#health"
-            Untitled.simpleStorage.store(key, value)
+            val key = "health"
+            this.setTrackedValue(key, value.toDouble())
         }
 
     override var mana: Int
         get() {
-            val key = "$uuid#mana"
+            val key = "mana"
 
-            if (Untitled.simpleStorage.retrieve(key) == null) {
-                Untitled.simpleStorage.store(key, DEFAULT_MANA)
+            if (this.getTrackedValue(key) == null) {
+                this.setTrackedValue(key, DEFAULT_MANA)
             }
 
-            val value = Untitled.simpleStorage.retrieve(key)
-
-            return when (value) {
-                is SafeAttributeValue.DoubleValue -> null
-                is SafeAttributeValue.IntValue -> value.value
-                is SafeAttributeValue.StringValue -> null
-                null -> null
-            }!!
+            val value = getTrackedValue(key)!!
+            return value.toInt()
         }
         set(value) {
-            val key = "$uuid#mana"
-            Untitled.simpleStorage.store(key, value)
+            val key = "mana"
+            this.setTrackedValue(key, value.toDouble())
         }
 
     override val normalizedFacingVector: Vector3d
@@ -163,7 +189,7 @@ open class SelectableEntityImpl(override val uuid: UUID) : SelectableEntity {
         val startPointCopy = Vector3d(startPoint)
         val endPointCopy = Vector3d(endPoint)
 
-        Untitled.newEventManager.registerEvent(BuiltinEvents.OnTick::class, {
+        eventManager.registerEvent(BuiltinEvents.OnTick::class, {
             if (counter >= durationTick) {
                 ent.velocity = Vector(0, 0, 0)
                 return@registerEvent false

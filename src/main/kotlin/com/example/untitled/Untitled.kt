@@ -1,5 +1,6 @@
 package com.example.untitled
 
+import com.example.untitled.apiImpl.entity.AttributeManagerImpl
 import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.apiImpl.spell.CooldownManager
 import com.example.untitled.apiImpl.spell.SpellManagerImpl
@@ -37,6 +38,8 @@ class Untitled : JavaPlugin() {
         val storageManager = StorageImpl()
         val spellManager = SpellManagerImpl(storageManager)
 
+        val persistentStorage = StorageImpl()
+        val attributeManager = AttributeManagerImpl(persistentStorage)
     }
 
     override fun onEnable() {
@@ -49,8 +52,13 @@ class Untitled : JavaPlugin() {
         scriptManager.reload()
 
         registerCommand()
-        LoadStartupScripts.Companion.load()
+        LoadStartupScripts.load()
         BuiltinStatsDisplay.register()
+        LoadStartupScripts.loadServer()
+    }
+
+    override fun onDisable() {
+        attributeManager.clean()
     }
 
     fun registerEvents() {
@@ -84,10 +92,10 @@ class Untitled : JavaPlugin() {
                         Commands.literal("reloadScripts")
                             .executes { ctx ->
                                 cooldownManager.clean()
-                                Untitled.newEventManager.clear()
+                                newEventManager.clear()
                                 storageManager.clear()
                                 scriptManager.reload()
-                                LoadStartupScripts.Companion.load()
+                                LoadStartupScripts.load()
                                 cooldownManager.registerEvent()
                                 return@executes 0
                             }
@@ -101,6 +109,7 @@ class Untitled : JavaPlugin() {
                             .executes({ ctx1 ->
                                 simpleStorage.debugDump()
                                 storageManager.debugDump()
+                                persistentStorage.debugDump()
                                 ctx1.source.sender.sendMessage(
                                     "Storage content has been printed to the server console"
                                 )
@@ -123,7 +132,5 @@ class Untitled : JavaPlugin() {
         )
     }
 
-    override fun onDisable() {
-        // Plugin shutdown logic
-    }
+
 }

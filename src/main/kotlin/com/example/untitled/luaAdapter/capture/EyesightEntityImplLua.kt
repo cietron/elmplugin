@@ -2,14 +2,12 @@ package com.example.untitled.luaAdapter.capture
 
 import com.example.untitled.api.player.Player
 import com.example.untitled.apiImpl.capture.EyesightEntityImpl
-import com.example.untitled.apiImpl.entity.PlayerImpl
-import com.example.untitled.luaAdapter.entity.SelectableEntityImplLua
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
-import java.util.*
 
 class EyesightEntityImplLua(val impl: EyesightEntityImpl) : TwoArgFunction() {
     override fun call(arg1: LuaValue?, arg2: LuaValue?): LuaValue? {
@@ -26,12 +24,15 @@ class EyesightEntityImplLua(val impl: EyesightEntityImpl) : TwoArgFunction() {
             return error("EyesightEntityImplLua bad arguments: $arg2")
         }
 
-        val name = arg1.get("name").tojstring()
-        val uuid = arg1.get("uuid").tojstring()
+        arg1.get("name").tojstring()
+        arg1.get("uuid").tojstring()
 
         val radius = arg2.toint()
 
-        val result = impl.getEyesightEntity(PlayerImpl(name, UUID.fromString(uuid)), radius)
+        val luaPlayer = PlayerImplBaseLua().fromLuaValue(arg1)
+        luaPlayer ?: return error("Player not found")
+
+        val result = impl.getEyesightEntity(luaPlayer.player, radius)
 
         if (result == null) {
             return NIL
