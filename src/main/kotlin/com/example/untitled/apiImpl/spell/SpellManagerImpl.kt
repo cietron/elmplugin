@@ -1,28 +1,67 @@
 package com.example.untitled.apiImpl.spell
 
-import com.example.untitled.api.spell.Spell
-import com.example.untitled.api.spell.SpellManager
+import com.example.untitled.Untitled
+import com.example.untitled.api.player.Player
+import com.example.untitled.api.spell.*
+import com.example.untitled.player.PlayerMessenger
 import com.example.untitled.storage.UnsafeStorage
 
-class SpellManagerImpl(val storage: UnsafeStorage) : SpellManager {
-    override fun registerSpell(identifier: String, spell: Spell): Boolean {
-        val key = this.getKey(identifier)
-
-        if (storage.retrieveRaw<Spell>(key) != null) {
-            return false
+class SpellManagerImpl(val storage: UnsafeStorage, val cooldownManager: CooldownManager) : SpellManager {
+    private fun getMap(player: Player): MutableMap<SpellKey, Spell<*>> {
+        val key = "SpellManager#player#${player.uuid}"
+        if (this.storage.retrieveRaw<HashMap<SpellKey, Spell<*>>>(key) == null) {
+            this.storage.storeRaw(key, HashMap<SpellKey, Spell<*>>())
         }
 
-        storage.storeRaw(key, spell)
+        return this.storage.retrieveRaw<HashMap<SpellKey, Spell<*>>>(key)!!
+    }
+
+    override fun registerSpell(
+        player: Player, triggerType: SpellTriggerType, spell: Spell<*>, slot: Slot?
+    ): Boolean {
+        val storeKey = SpellKey(triggerType, slot)
+        Untitled.instance.logger.info("registered spell ${spell.identifier} at slot ${slot} for ${player.name}. SpellKey hash: ${storeKey.hashCode()}")
+        val map = this.getMap(player)
+        map.put(storeKey, spell)
         return true
     }
 
-    override fun getSpell(identifier: String): Spell? {
-        val key = this.getKey(identifier)
-
-        return storage.retrieveRaw<Spell>(key)
+    override fun cleanPlayerSpell(player: Player) {
+        this.getMap(player).clear()
     }
 
-    private fun getKey(identifier: String): String {
-        return "spell#$identifier"
+    override fun handleSpellTrigger(player: Player, context: SpellTriggerContext): Boolean {
+        val map = this.getMap(player)
+        val spell = when (context) {
+            is SpellTriggerContext.DoubleShift -> map[SpellKey(context.triggerType, null)]
+            is SpellTriggerContext.HitEntity -> map[SpellKey(context.triggerType, null)]
+            is SpellTriggerContext.RightClick -> map[SpellKey(context.triggerType, context.slot)]
+        }
+
+        spell ?: return false
+
+        return this.executeSpell(spell, context)
     }
+
+    private fun executeSpell(spell: Spell<*>, context: SpellTriggerContext): Boolean {
+
+        if (!spell.preCheck(context)) {
+            return false
+        }
+
+        val identifier = spell.identifier
+        val caster = context.player
+
+        if (cooldownManager.isCoolingDown(caster, identifier)) {
+            val remainingTicks = cooldownManager.getRemainingTicks(caster, identifier)
+            PlayerMessenger.sendCooldownMessage(caster, identifier, remainingTicks)
+            return false
+        }
+
+        spell.execute(context)
+        cooldownManager.store(caster, identifier, spell.cooldownTicks)
+        return true
+    }
+
+    private data class SpellKey(val triggerType: SpellTriggerType, val slot: Slot?)
 }

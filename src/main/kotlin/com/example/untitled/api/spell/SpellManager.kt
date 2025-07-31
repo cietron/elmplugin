@@ -1,7 +1,11 @@
 package com.example.untitled.api.spell
 
-interface SpellManager {
-    fun registerSpell(identifier: String, spell: Spell): Boolean
+import com.example.untitled.api.player.Player
 
-    fun getSpell(identifier: String): Spell?
+interface SpellManager {
+    fun registerSpell(player: Player, triggerType: SpellTriggerType, spell: Spell<*>, slot: Slot?): Boolean
+
+    fun cleanPlayerSpell(player: Player)
+
+    fun handleSpellTrigger(player: Player, context: SpellTriggerContext): Boolean
 }

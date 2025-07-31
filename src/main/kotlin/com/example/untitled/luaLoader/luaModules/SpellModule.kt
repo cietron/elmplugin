@@ -13,7 +13,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 class SpellModule() : TwoArgFunction() {
     override fun call(modname: LuaValue?, env: LuaValue): LuaValue {
         val library = tableOf()
-        library.set("registerSpell", RegisterSpell(Untitled.spellManager))
+        library.set("registerSpell", RegisterSpell(Untitled.spellRepository))
         env.set("spellLib", library)
         env["package"]["loaded"].set("spellLib", library)
         return library

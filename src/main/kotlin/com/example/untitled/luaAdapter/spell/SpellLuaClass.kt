@@ -1,19 +1,26 @@
 package com.example.untitled.luaAdapter.spell
 
+import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
 import com.example.untitled.api.spell.Spell
+import com.example.untitled.api.spell.SpellTriggerContext
+import com.example.untitled.api.spell.SpellTriggerType
+import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.player.PlayerImplBaseLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import net.kyori.adventure.text.Component
+import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.LuaTable
 
 /**
  * @custom.LuaDoc ---@class spell
+ * @custom.LuaDoc ---@field identifier string
  * @custom.LuaDoc ---@field displayName string
  * @custom.LuaDoc ---@field description string
  * @custom.LuaDoc ---@field cooldownTicks integer
- * @custom.LuaDoc ---@field preCheck fun(caster: player): boolean # Interpreted to false if the function returns a non-boolean value
- * @custom.LuaDoc ---@field execute fun(caster: player)
+ * @custom.LuaDoc ---@field triggerType string # One of: "right_click", "double_shift", "hit_entity"
+ * @custom.LuaDoc ---@field preCheck fun(caster: player, victim?: selectable_entity|player): boolean # For "hit_entity" trigger, both caster and victim are passed; for others, only caster.
+ * @custom.LuaDoc ---@field execute fun(caster: player, victim?: selectable_entity|player) # For "hit_entity" trigger, both caster and victim are passed; for others, only caster.
  */
 class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", true) {
 
@@ -25,15 +32,19 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {
+        val identifier = table.get("identifier")
         val displayName = table.get("displayName")
         val description = table.get("description")
         val cooldownTicks = table.get("cooldownTicks")
+        val triggerType = table.get("triggerType")
         val preCheckFunc = table.get("preCheck")
         val executeFunc = table.get("execute")
 
-        return !displayName.isnil() && displayName.isstring()
+        return !identifier.isnil() && identifier.isstring()
+                && !displayName.isnil() && displayName.isstring()
                 && !description.isnil() && description.isstring()
                 && !cooldownTicks.isnil() && cooldownTicks.isint()
+                && !triggerType.isnil() && triggerType.isstring()
                 && !preCheckFunc.isnil() && preCheckFunc.isfunction()
                 && !executeFunc.isnil() && executeFunc.isfunction()
     }
@@ -41,37 +52,174 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
     override fun fromTable(table: LuaTable): Container? {
         if (!checkParseTable(table)) return null
 
-        val displayNameValue = table.get("displayName")
-        val descriptionValue = table.get("description")
-        val cooldownTicksValue = table.get("cooldownTicks")
-        val preCheckFunc = table.get("preCheck")
-        val executeFunc = table.get("execute")
+        val identifier = table.get("identifier").tojstring()
+        val displayNameValue = table.get("displayName").tojstring()
+        val descriptionValue = table.get("description").tojstring()
+        val cooldownTicksValue = table.get("cooldownTicks").toint()
+        val triggerTypeKey = table.get("triggerType").tojstring()
+        val preCheckFunc = table.get("preCheck") as LuaFunction
+        val executeFunc = table.get("execute") as LuaFunction
 
-        val spell = object : Spell {
-            override val displayName: Component =
-                Component.text(displayNameValue.tojstring())
-            override val description: Component =
-                Component.text(descriptionValue.tojstring())
-            override val cooldownTicks: Int = cooldownTicksValue.toint()
+        val triggerType = SpellTriggerType.fromKey(triggerTypeKey)
 
-            override fun preCheck(player: Player): Boolean {
+        triggerType ?: return null
+        val spell = when (triggerType.key) {
+            SpellTriggerType.HitEntity.key -> this.makeHitEntity(
+                identifier,
+                displayNameValue,
+                descriptionValue,
+                cooldownTicksValue,
+                preCheckFunc,
+                executeFunc
+            )
+
+            SpellTriggerType.RightClick.key -> this.makeRightClick(
+                identifier,
+                displayNameValue,
+                descriptionValue,
+                cooldownTicksValue,
+                preCheckFunc,
+                executeFunc
+            )
+
+            SpellTriggerType.DoubleShift.key -> this.makeDoubleShift(
+                identifier,
+                displayNameValue,
+                descriptionValue,
+                cooldownTicksValue,
+                preCheckFunc,
+                executeFunc
+            )
+
+            else -> null
+        }
+
+        spell ?: return null
+
+        return Container(spell)
+    }
+
+    private fun makeRightClick(
+        identifier: String,
+        displayName: String,
+        description: String,
+        cooldownTicks: Int,
+        preCheck: LuaFunction,
+        execute: LuaFunction
+    ): Spell<SpellTriggerContext.RightClick> {
+        return object : Spell<SpellTriggerContext.RightClick> {
+            override val identifier = identifier
+            override val displayName = Component.text(displayName)
+            override val description = Component.text(description)
+            override val cooldownTicks = cooldownTicks
+            override val triggerType: SpellTriggerType = SpellTriggerType.RightClick
+
+            override fun preCheck(context: SpellTriggerContext.RightClick): Boolean {
+                val player = context.player
                 val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
-                val result = preCheckFunc.call(table)
+                val result = preCheck.call(table)
                 if (result.isnil() || !result.isboolean()) {
                     return false
                 }
                 return result.toboolean()
             }
 
-            override fun execute(player: Player) {
+            override fun execute(context: SpellTriggerContext.RightClick) {
+                val player = context.player
                 val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
-                executeFunc.call(table)
+                execute.call(table)
             }
         }
-
-        return Container(spell)
     }
 
-    data class Container(val spell: Spell)
+    private fun makeDoubleShift(
+        identifier: String,
+        displayName: String,
+        description: String,
+        cooldownTicks: Int,
+        preCheck: LuaFunction,
+        execute: LuaFunction
+    ): Spell<SpellTriggerContext.DoubleShift> {
+        return object : Spell<SpellTriggerContext.DoubleShift> {
+            override val identifier = identifier
+            override val displayName = Component.text(displayName)
+            override val description = Component.text(description)
+            override val cooldownTicks = cooldownTicks
+            override val triggerType: SpellTriggerType = SpellTriggerType.DoubleShift
+
+            override fun preCheck(context: SpellTriggerContext.DoubleShift): Boolean {
+                val player = context.player
+                val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+                val result = preCheck.call(table)
+                if (result.isnil() || !result.isboolean()) {
+                    return false
+                }
+                return result.toboolean()
+            }
+
+            override fun execute(context: SpellTriggerContext.DoubleShift) {
+                val player = context.player
+                val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+                execute.call(table)
+            }
+        }
+    }
+
+    private fun makeHitEntity(
+        identifier: String,
+        displayName: String,
+        description: String,
+        cooldownTicks: Int,
+        preCheck: LuaFunction,
+        execute: LuaFunction
+    ): Spell<SpellTriggerContext.HitEntity> {
+        return object : Spell<SpellTriggerContext.HitEntity> {
+            override val identifier = identifier
+            override val displayName = Component.text(displayName)
+            override val description = Component.text(description)
+            override val cooldownTicks = cooldownTicks
+            override val triggerType: SpellTriggerType = SpellTriggerType.HitEntity
+
+            override fun preCheck(context: SpellTriggerContext.HitEntity): Boolean {
+                val player = context.player
+                val victim = context.victim
+
+                val victimTable = when (victim) {
+                    is Player -> PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(victim))
+                    is SelectableEntity -> SelectableEntityImplLua().getNewTable(
+                        SelectableEntityImplLua.Container(
+                            victim
+                        )
+                    )
+                }
+
+                val playerTable = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+                val result = preCheck.call(playerTable, victimTable)
+                if (result.isnil() || !result.isboolean()) {
+                    return false
+                }
+                return result.toboolean()
+            }
+
+            override fun execute(context: SpellTriggerContext.HitEntity) {
+                val player = context.player
+                val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+
+                val victim = context.victim
+
+                val victimTable = when (victim) {
+                    is Player -> PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(victim))
+                    is SelectableEntity -> SelectableEntityImplLua().getNewTable(
+                        SelectableEntityImplLua.Container(
+                            victim
+                        )
+                    )
+                }
+                execute.call(table, victimTable)
+            }
+        }
+    }
+
+    data class Container(val spell: Spell<*>)
 }
 

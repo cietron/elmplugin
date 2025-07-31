@@ -1,13 +1,15 @@
 package com.example.untitled.api.spell
 
-import com.example.untitled.api.player.Player
 import net.kyori.adventure.text.Component
 
-interface Spell {
+// This generic parameter does nothing, but refactoring it takes lots of efforts.
+interface Spell<out T : SpellTriggerContext> {
+    val identifier: String
     val displayName: Component
     val description: Component
     val cooldownTicks: Int
+    val triggerType: SpellTriggerType
 
-    fun preCheck(player: Player): Boolean
-    fun execute(player: Player)
+    fun preCheck(context: @UnsafeVariance T): Boolean
+    fun execute(context: @UnsafeVariance T)
 }
