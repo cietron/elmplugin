@@ -5,15 +5,14 @@ import com.example.untitled.apiImpl.entity.EntityFactory
 import com.example.untitled.luaAdapter.entity.selectable.SelectableEntityImplLua
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import org.luaj.vm2.LuaTable
-import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.OneArgFunction
 import java.util.*
 
 /**
  * @custom.LuaDoc ---@class Player : selectable_entity
  * @custom.LuaDoc ---@field name string The player's display name
  * @custom.LuaDoc ---@field setCooldown fun(spellName: string, tickDuration: integer): boolean Sets a cooldown for a spell
- * @custom.LuaDoc ---@field sendMessage fun(message: string): boolean Sends a message to the player
+ * @custom.LuaDoc ---@field sendMessage fun(msg: message): nil Sends a message to the player. Throws error if the message table is not valid.
+ * @custom.LuaDoc ---@field sendPlainChatMessage fun(plainMessage: string)
  * @custom.LuaDoc ---@field sendActionbarMessage fun(message: string): boolean Sends a message to the player's action bar
  * @custom.LuaDoc ---@field getEquipments fun(): item[] # Partial completed item class. Available fields: identifier, vanillaItemID, type
  * @custom.LuaDoc local Player = {}
@@ -31,18 +30,8 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
         SelectableEntityImplLua().getTable(table, SelectableEntityImplLua.Container(player))
 
         table.set("name", player.name)
-        table.set("sendMessage", object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue? {
-                if (!arg.isstring()) {
-                    error("Not string")
-                }
-
-                player.sendMessage(arg.tojstring())
-                return TRUE
-            }
-
-        })
-
+        table.set("sendMessage", SendMessage(player))
+        table.set("sendPlainChatMessage", SendPlainChatMessage(player))
         table.set("setCooldown", SetSpellCooldown(player))
         table.set("sendActionbarMessage", SendActionbarMessage(player))
         table.set("getEquipments", GetEquipments(player))

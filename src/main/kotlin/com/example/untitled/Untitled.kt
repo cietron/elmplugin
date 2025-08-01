@@ -17,7 +17,6 @@ import com.example.untitled.luaLoader.ScriptLoader
 import com.example.untitled.luaLoader.ScriptManager
 import com.example.untitled.player.BuiltinStatsDisplay
 import com.example.untitled.screen.ScreenManager
-import com.example.untitled.storage.SimpleStorage
 import com.example.untitled.storage.StorageImpl
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import org.bukkit.plugin.java.JavaPlugin
@@ -32,13 +31,13 @@ class Untitled : JavaPlugin() {
 
         val scriptManager = ScriptManager()
         val eventManager = EventManager()
-        val simpleStorage = SimpleStorage()
         val newEventManager = EventManagerImpl()
 
         // temporary concrete class solution
         val cooldownManager = CooldownManager(newEventManager)
 
         val storageManager = StorageImpl()
+        val persistentStorage = StorageImpl()
         val spellManager = SpellManagerImpl(storageManager, cooldownManager)
 
         val spellRepository = GenericRepository<Spell<*>>("spellRepository_registeredSpell", storageManager)
@@ -47,7 +46,7 @@ class Untitled : JavaPlugin() {
         val equipmentRepository = GenericRepository<Equipment>("equipmentRepository", storageManager)
         val equipmentManager = EquipmentManagerImpl(storageManager)
 
-        val attributeRepository = GenericRepository<Attribute>("attributeRepository", storageManager)
+        val attributeRepository = GenericRepository<Attribute>("attributeRepository", persistentStorage)
         val attributeManager = AttributeManagerImpl(storageManager, attributeRepository)
     }
 
@@ -89,6 +88,7 @@ class Untitled : JavaPlugin() {
                 event.registrar()?.register(PluginCommands.openInventoryCommand())
                 event.registrar()?.register(PluginCommands.obtainSpell())
                 event.registrar()?.register(PluginCommands.obtainEquipment())
+                event.registrar()?.register(PluginCommands.testScoreBoard())
             }
         )
     }

@@ -3,15 +3,18 @@ package com.example.untitled.commands
 import com.example.untitled.Untitled
 import com.example.untitled.Untitled.Companion.cooldownManager
 import com.example.untitled.Untitled.Companion.newEventManager
+import com.example.untitled.Untitled.Companion.persistentStorage
 import com.example.untitled.Untitled.Companion.scriptManager
-import com.example.untitled.Untitled.Companion.simpleStorage
 import com.example.untitled.Untitled.Companion.storageManager
 import com.example.untitled.luaLoader.LoadStartupScripts
 import com.example.untitled.luaLoader.ScriptManager
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
+import org.bukkit.scoreboard.Criteria
+import org.bukkit.scoreboard.DisplaySlot
 import java.util.logging.Logger
 
 object PluginCommands {
@@ -48,8 +51,8 @@ object PluginCommands {
         return Commands.literal("DumpStorage")
             .requires { stack -> stack.sender.isOp }
             .executes({ ctx1 ->
-                simpleStorage.debugDump()
                 storageManager.debugDump()
+                persistentStorage.debugDump()
                 ctx1.source.sender.sendMessage(
                     "Storage content has been printed to the server console"
                 )
@@ -89,6 +92,23 @@ object PluginCommands {
             .executes { ctx1 ->
                 Untitled.screenManager.openScreen(ctx1.source.sender as Player, "obtainEquipment")
                 return@executes 0
+            }.build()
+    }
+
+    fun testScoreBoard(): LiteralCommandNode<CommandSourceStack> {
+        var counter = 0
+        return Commands.literal("testScoreboard")
+            .executes { ctx ->
+                counter++
+                val player = ctx.source.sender as Player
+                val testComponent = MiniMessage.miniMessage().deserialize("<b>你好</b><color:#5bff03>世界</color>")
+                println(player.scoreboard)
+                if (player.scoreboard.getObjective("bb") == null) {
+                    player.scoreboard.registerNewObjective("bb", Criteria.DUMMY, testComponent)
+                }
+                player.scoreboard.getObjective("bb")!!.displayName(testComponent)
+                player.scoreboard.getObjective("bb")!!.displaySlot = DisplaySlot.SIDEBAR
+                0
             }.build()
     }
 }
