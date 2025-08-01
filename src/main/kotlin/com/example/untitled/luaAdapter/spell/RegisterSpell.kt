@@ -1,10 +1,11 @@
 package com.example.untitled.luaAdapter.spell
 
-import com.example.untitled.api.spell.SpellRepository
+import com.example.untitled.api.spell.Spell
+import com.example.untitled.apiImpl.store.Repository
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 
-class RegisterSpell(val impl: SpellRepository) : TwoArgFunction() {
+class RegisterSpell(val impl: Repository<Spell<*>>) : TwoArgFunction() {
     override fun call(identifier: LuaValue, spellClass: LuaValue): LuaValue? {
         if (identifier.isnil() || !identifier.isstring()) {
             return error("registerSpell: first argument must be a string identifier")

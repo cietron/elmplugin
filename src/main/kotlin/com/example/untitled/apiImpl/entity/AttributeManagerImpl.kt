@@ -1,24 +1,22 @@
 package com.example.untitled.apiImpl.entity
 
 import com.example.untitled.Untitled
+import com.example.untitled.api.attribute.Attribute
 import com.example.untitled.api.attribute.AttributeManager
+import com.example.untitled.api.attribute.AttributeSet
+import com.example.untitled.apiImpl.store.Repository
 import com.example.untitled.storage.Storage
 import com.example.untitled.storage.StorageValue
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
+import org.bukkit.attribute.AttributeInstance
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.LivingEntity
 import java.util.*
 
 
-class AttributeManagerImpl(val storage: Storage) : AttributeManager {
-    val defaultValues = HashMap<String, Double>()
-
-    override fun registerKey(key: String, defaultValue: Double) {
-        this.defaultValues.put(key, defaultValue)
-    }
-
+class AttributeManagerImpl(val storage: Storage, val attributeRepository: Repository<Attribute>) : AttributeManager {
     override fun clean() {
         Bukkit.getWorlds().forEach { world ->
             world.entities.forEach { entity ->
@@ -31,36 +29,52 @@ class AttributeManagerImpl(val storage: Storage) : AttributeManager {
         }
     }
 
-    override fun get(entity: LivingEntity): List<Map.Entry<String, Double>> {
-        val result = mutableListOf<Map.Entry<String, Double>>()
+    override fun get(entity: LivingEntity): AttributeSet {
+        val result = mutableListOf<Attribute>()
 
         Registry.ATTRIBUTE.forEach { attribute ->
             val vv = this.getVanillaAttributeByKey(entity, attribute.key)
             if (vv != null) {
-                result.add(vv)
+                result.add(Attribute(attribute.key.key, vv.value))
             }
         }
 
-        for (key in this.defaultValues.keys) {
-
+        for (attr in attributeRepository.getAll()) {
+            val key = attr.identifier
             val value = storage.retrieve(this.getStorageKey(entity.uniqueId, key))
             val doubleValue = when (value) {
                 is StorageValue.IntValue -> value.value.toDouble()
                 is StorageValue.DoubleValue -> value.value
                 is StorageValue.StringValue -> Double.NaN
-                null -> this.defaultValues[key]
+                null -> attr.value // default value from repository
             }
 
-            if (doubleValue == Double.NaN) {
-                Untitled.instance.logger.warning("Attribute key $key incorrect storage type. Found $doubleValue.")
+            if (doubleValue.isNaN()) {
+                Untitled.instance.logger.warning("Attribute key $attr incorrect storage type. Found $doubleValue.")
+                continue
             }
 
-            if (doubleValue is Double) {
-                result.add(AbstractMap.SimpleEntry(key, doubleValue))
+            result.add(attr)
+        }
+
+        return AttributeSet.fromList(result)
+    }
+
+    override fun getDefault(entity: LivingEntity): AttributeSet {
+        val result = mutableListOf<Attribute>()
+
+        Registry.ATTRIBUTE.forEach { attribute ->
+            val attr = this.getVanillaAttributeInstance(entity, attribute.key)
+            if (attr != null) {
+                result.add(Attribute(attribute.key.key, attr.baseValue))
             }
         }
 
-        return result.toList()
+        for (entry in attributeRepository.getAll()) {
+            result.add(entry)
+        }
+
+        return AttributeSet.fromList(result)
     }
 
     override fun notifyChange(entity: LivingEntity, key: String, newValue: Double) {
@@ -89,8 +103,14 @@ class AttributeManagerImpl(val storage: Storage) : AttributeManager {
         return true
     }
 
-    private fun getVanillaAttribute(entity: LivingEntity, name: String): Map.Entry<String, Double>? {
-        return this.getVanillaAttributeByKey(entity, NamespacedKey.minecraft(name))
+    private fun getVanillaAttributeInstance(entity: LivingEntity, key: NamespacedKey): AttributeInstance? {
+        try {
+            val attr = Registry.ATTRIBUTE.getOrThrow(key)
+            val value = entity.getAttribute(attr)
+            return value
+        } catch (e: NoSuchElementException) {
+            return null
+        }
     }
 
     private fun getVanillaAttributeByKey(entity: LivingEntity, key: NamespacedKey): Map.Entry<String, Double>? {

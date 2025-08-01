@@ -1,6 +1,7 @@
 package com.example.untitled.apiImpl.entity
 
 import com.example.untitled.api.attribute.AttributeManager
+import com.example.untitled.api.attribute.AttributeSet
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.event.BuiltinEvents
 import com.example.untitled.api.event.EventManager
@@ -38,7 +39,7 @@ open class SelectableEntityImpl(
             return Vector3d(loc.x, loc.y, loc.z)
         }
 
-    override fun getAttribute(): List<Map.Entry<String, Double>>? {
+    override fun getAttribute(): AttributeSet? {
         val rawEntity = Bukkit.getEntity(uuid)
         val ent = when (rawEntity) {
             is LivingEntity -> rawEntity

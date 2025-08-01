@@ -9,6 +9,15 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import java.util.*
 
+/**
+ * @custom.LuaDoc ---@class Player : selectable_entity
+ * @custom.LuaDoc ---@field name string The player's display name
+ * @custom.LuaDoc ---@field setCooldown fun(spellName: string, tickDuration: integer): boolean Sets a cooldown for a spell
+ * @custom.LuaDoc ---@field sendMessage fun(message: string): boolean Sends a message to the player
+ * @custom.LuaDoc ---@field sendActionbarMessage fun(message: string): boolean Sends a message to the player's action bar
+ * @custom.LuaDoc ---@field getEquipments fun(): item[] # Partial completed item class. Available fields: identifier, vanillaItemID, type
+ * @custom.LuaDoc local Player = {}
+ */
 class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, true) {
 
     companion object {
@@ -36,6 +45,7 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
 
         table.set("setCooldown", SetSpellCooldown(player))
         table.set("sendActionbarMessage", SendActionbarMessage(player))
+        table.set("getEquipments", GetEquipments(player))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {

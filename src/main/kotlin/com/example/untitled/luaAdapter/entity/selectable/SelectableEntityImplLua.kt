@@ -20,7 +20,7 @@ import java.util.*
  * @custom.LuaDoc ---@field location vector3d
  * @custom.LuaDoc ---@field normalizedFacingVector vector3d
  * @custom.LuaDoc ---@field isPlayer boolean
- * @custom.LuaDoc ---@field get_attribute fun(): table<string, number>
+ * @custom.LuaDoc ---@field get_attribute fun(): attributeSet
  * @custom.LuaDoc ---@field set_attribute fun(attributeName: string, value: number): boolean
  * @custom.LuaDoc ---@field get_tracked_value fun(valueName: string): number
  * @custom.LuaDoc ---@field set_tracked_value fun(valueName: string, value: number): boolean

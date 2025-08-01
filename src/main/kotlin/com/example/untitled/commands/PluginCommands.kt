@@ -3,7 +3,6 @@ package com.example.untitled.commands
 import com.example.untitled.Untitled
 import com.example.untitled.Untitled.Companion.cooldownManager
 import com.example.untitled.Untitled.Companion.newEventManager
-import com.example.untitled.Untitled.Companion.persistentStorage
 import com.example.untitled.Untitled.Companion.scriptManager
 import com.example.untitled.Untitled.Companion.simpleStorage
 import com.example.untitled.Untitled.Companion.storageManager
@@ -51,7 +50,6 @@ object PluginCommands {
             .executes({ ctx1 ->
                 simpleStorage.debugDump()
                 storageManager.debugDump()
-                persistentStorage.debugDump()
                 ctx1.source.sender.sendMessage(
                     "Storage content has been printed to the server console"
                 )
@@ -73,7 +71,7 @@ object PluginCommands {
     fun openInventoryCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("openInventory")
             .executes { ctx1 ->
-                Untitled.screenManager.openScreen(ctx1.source.sender as Player, "spellEquipScreen")
+                Untitled.screenManager.openScreen(ctx1.source.sender as Player, "equipmentScreen")
                 return@executes 0
             }.build()
     }
@@ -82,6 +80,14 @@ object PluginCommands {
         return Commands.literal("obtainSpell")
             .executes { ctx1 ->
                 Untitled.screenManager.openScreen(ctx1.source.sender as Player, "obtainSpell")
+                return@executes 0
+            }.build()
+    }
+
+    fun obtainEquipment(): LiteralCommandNode<CommandSourceStack> {
+        return Commands.literal("obtainEquipment")
+            .executes { ctx1 ->
+                Untitled.screenManager.openScreen(ctx1.source.sender as Player, "obtainEquipment")
                 return@executes 0
             }.build()
     }

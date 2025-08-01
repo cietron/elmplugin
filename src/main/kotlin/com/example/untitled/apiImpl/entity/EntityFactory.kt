@@ -16,7 +16,8 @@ object EntityFactory {
             bukkitPlayer.uniqueId,
             Untitled.storageManager,
             Untitled.newEventManager,
-            Untitled.attributeManager
+            Untitled.attributeManager,
+            Untitled.equipmentManager
         )
     }
 

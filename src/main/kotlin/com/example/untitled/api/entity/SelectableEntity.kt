@@ -1,5 +1,6 @@
 package com.example.untitled.api.entity
 
+import com.example.untitled.api.attribute.AttributeSet
 import org.joml.Vector3d
 import org.joml.Vector4d
 import java.util.*
@@ -10,7 +11,7 @@ interface SelectableEntity {
     val normalizedFacingVector: Vector3d
     val isPlayer: Boolean
 
-    fun getAttribute(): List<Map.Entry<String, Double>>?
+    fun getAttribute(): AttributeSet?
 
     fun setAttribute(attributeName: String, value: Double): Boolean
 

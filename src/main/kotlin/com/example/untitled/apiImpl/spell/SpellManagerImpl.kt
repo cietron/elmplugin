@@ -19,8 +19,12 @@ class SpellManagerImpl(val storage: UnsafeStorage, val cooldownManager: Cooldown
     override fun registerSpell(
         player: Player, triggerType: SpellTriggerType, spell: Spell<*>, slot: Slot?
     ): Boolean {
-        val storeKey = SpellKey(triggerType, slot)
-        Untitled.instance.logger.info("registered spell ${spell.identifier} at slot ${slot} for ${player.name}. SpellKey hash: ${storeKey.hashCode()}")
+        val storeKey = when (triggerType) {
+            SpellTriggerType.DoubleShift -> SpellKey(triggerType, null)
+            SpellTriggerType.HitEntity -> SpellKey(triggerType, null)
+            SpellTriggerType.RightClick -> SpellKey(triggerType, slot)
+        }
+        Untitled.instance.logger.info("registered spell ${spell.identifier} at slot ${slot} for ${player.name}")
         val map = this.getMap(player)
         map.put(storeKey, spell)
         return true

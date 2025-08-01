@@ -1,10 +1,14 @@
 package com.example.untitled
 
+import com.example.untitled.api.attribute.Attribute
+import com.example.untitled.api.item.Equipment
+import com.example.untitled.api.spell.Spell
 import com.example.untitled.apiImpl.entity.AttributeManagerImpl
 import com.example.untitled.apiImpl.event.EventManagerImpl
+import com.example.untitled.apiImpl.item.EquipmentManagerImpl
 import com.example.untitled.apiImpl.spell.CooldownManager
 import com.example.untitled.apiImpl.spell.SpellManagerImpl
-import com.example.untitled.apiImpl.spell.SpellRepositoryImpl
+import com.example.untitled.apiImpl.store.GenericRepository
 import com.example.untitled.commands.PluginCommands
 import com.example.untitled.events.*
 import com.example.untitled.luaLoader.EventManager
@@ -37,11 +41,14 @@ class Untitled : JavaPlugin() {
         val storageManager = StorageImpl()
         val spellManager = SpellManagerImpl(storageManager, cooldownManager)
 
-        val persistentStorage = StorageImpl()
-        val attributeManager = AttributeManagerImpl(persistentStorage)
-
-        val spellRepository = SpellRepositoryImpl(storageManager)
+        val spellRepository = GenericRepository<Spell<*>>("spellRepository_registeredSpell", storageManager)
         val screenManager = ScreenManager()
+
+        val equipmentRepository = GenericRepository<Equipment>("equipmentRepository", storageManager)
+        val equipmentManager = EquipmentManagerImpl(storageManager)
+
+        val attributeRepository = GenericRepository<Attribute>("attributeRepository", storageManager)
+        val attributeManager = AttributeManagerImpl(storageManager, attributeRepository)
     }
 
     override fun onEnable() {
@@ -81,6 +88,7 @@ class Untitled : JavaPlugin() {
                 event.registrar()?.register(PluginCommands.dumpEventManagerCommand())
                 event.registrar()?.register(PluginCommands.openInventoryCommand())
                 event.registrar()?.register(PluginCommands.obtainSpell())
+                event.registrar()?.register(PluginCommands.obtainEquipment())
             }
         )
     }
