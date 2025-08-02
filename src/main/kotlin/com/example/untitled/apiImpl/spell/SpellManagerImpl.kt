@@ -23,6 +23,7 @@ class SpellManagerImpl(val storage: UnsafeStorage, val cooldownManager: Cooldown
             SpellTriggerType.DoubleShift -> SpellKey(triggerType, null)
             SpellTriggerType.HitEntity -> SpellKey(triggerType, null)
             SpellTriggerType.RightClick -> SpellKey(triggerType, slot)
+            SpellTriggerType.ArrowHitEntity -> SpellKey(triggerType, slot)
         }
         Untitled.instance.logger.info("registered spell ${spell.identifier} at slot ${slot} for ${player.name}")
         val map = this.getMap(player)
@@ -40,6 +41,7 @@ class SpellManagerImpl(val storage: UnsafeStorage, val cooldownManager: Cooldown
             is SpellTriggerContext.DoubleShift -> map[SpellKey(context.triggerType, null)]
             is SpellTriggerContext.HitEntity -> map[SpellKey(context.triggerType, null)]
             is SpellTriggerContext.RightClick -> map[SpellKey(context.triggerType, context.slot)]
+            is SpellTriggerContext.ArrowHitEntity -> map[SpellKey(context.triggerType, context.slot)]
         }
 
         spell ?: return false

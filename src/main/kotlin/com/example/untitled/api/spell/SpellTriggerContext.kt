@@ -25,6 +25,11 @@ sealed class SpellTriggerContext {
     ) : SpellTriggerContext() {
         override val triggerType = SpellTriggerType.HitEntity
     }
+
+    data class ArrowHitEntity(override val player: Player, val victim: SelectableEntity, val slot: Slot) :
+        SpellTriggerContext() {
+        override val triggerType = SpellTriggerType.ArrowHitEntity
+    }
 }
 
 
@@ -38,7 +43,8 @@ enum class Slot {
 enum class SpellTriggerType(val key: String, val contextClass: KClass<*>) {
     DoubleShift("double_shift", SpellTriggerContext.DoubleShift::class),
     RightClick("right_click", SpellTriggerContext.RightClick::class),
-    HitEntity("hit_entity", SpellTriggerContext.HitEntity::class);
+    HitEntity("hit_entity", SpellTriggerContext.HitEntity::class),
+    ArrowHitEntity("arrow_hit_entity", SpellTriggerContext.ArrowHitEntity::class);
 
     companion object {
         fun fromKey(key: String): SpellTriggerType? {

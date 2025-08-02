@@ -39,6 +39,13 @@ open class SelectableEntityImpl(
             return Vector3d(loc.x, loc.y, loc.z)
         }
 
+    override val isOnGround: Boolean
+        get() {
+            val ent = Bukkit.getEntity(uuid)
+            ent ?: return false
+            return ent.isOnGround
+        }
+
     override fun getAttribute(): AttributeSet? {
         val rawEntity = Bukkit.getEntity(uuid)
         val ent = when (rawEntity) {

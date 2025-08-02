@@ -10,6 +10,7 @@ interface SelectableEntity {
     val position: Vector3d
     val normalizedFacingVector: Vector3d
     val isPlayer: Boolean
+    val isOnGround: Boolean
 
     fun getAttribute(): AttributeSet?
 

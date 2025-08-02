@@ -91,6 +91,15 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
                 executeFunc
             )
 
+            SpellTriggerType.ArrowHitEntity.key -> this.makeArrowHitEntity(
+                identifier,
+                displayNameValue,
+                descriptionValue,
+                cooldownTicksValue,
+                preCheckFunc,
+                executeFunc
+            )
+
             else -> null
         }
 
@@ -107,11 +116,7 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
         preCheck: LuaFunction,
         execute: LuaFunction
     ): Spell<SpellTriggerContext.RightClick> {
-        return object : Spell<SpellTriggerContext.RightClick> {
-            override val identifier = identifier
-            override val displayName = Component.text(displayName)
-            override val description = Component.text(description)
-            override val cooldownTicks = cooldownTicks
+        return object : BaseSpell<SpellTriggerContext.RightClick>(identifier, displayName, description, cooldownTicks) {
             override val triggerType: SpellTriggerType = SpellTriggerType.RightClick
 
             override fun preCheck(context: SpellTriggerContext.RightClick): Boolean {
@@ -140,11 +145,8 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
         preCheck: LuaFunction,
         execute: LuaFunction
     ): Spell<SpellTriggerContext.DoubleShift> {
-        return object : Spell<SpellTriggerContext.DoubleShift> {
-            override val identifier = identifier
-            override val displayName = Component.text(displayName)
-            override val description = Component.text(description)
-            override val cooldownTicks = cooldownTicks
+        return object :
+            BaseSpell<SpellTriggerContext.DoubleShift>(identifier, displayName, description, cooldownTicks) {
             override val triggerType: SpellTriggerType = SpellTriggerType.DoubleShift
 
             override fun preCheck(context: SpellTriggerContext.DoubleShift): Boolean {
@@ -173,11 +175,7 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
         preCheck: LuaFunction,
         execute: LuaFunction
     ): Spell<SpellTriggerContext.HitEntity> {
-        return object : Spell<SpellTriggerContext.HitEntity> {
-            override val identifier = identifier
-            override val displayName = Component.text(displayName)
-            override val description = Component.text(description)
-            override val cooldownTicks = cooldownTicks
+        return object : BaseSpell<SpellTriggerContext.HitEntity>(identifier, displayName, description, cooldownTicks) {
             override val triggerType: SpellTriggerType = SpellTriggerType.HitEntity
 
             override fun preCheck(context: SpellTriggerContext.HitEntity): Boolean {
@@ -219,6 +217,67 @@ class SpellLuaClass : BaseLuaTable<SpellLuaClass.Container>("SpellLuaClass", tru
             }
         }
     }
+
+    private fun makeArrowHitEntity(
+        identifier: String,
+        displayName: String,
+        description: String,
+        cooldownTicks: Int,
+        preCheck: LuaFunction,
+        execute: LuaFunction
+    ): Spell<SpellTriggerContext.ArrowHitEntity> {
+        return object :
+            BaseSpell<SpellTriggerContext.ArrowHitEntity>(identifier, displayName, description, cooldownTicks) {
+            override val triggerType = SpellTriggerType.ArrowHitEntity
+
+            override fun preCheck(context: SpellTriggerContext.ArrowHitEntity): Boolean {
+                val player = context.player
+                val victim = context.victim
+
+                val victimTable = when (victim) {
+                    is Player -> PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(victim))
+                    is SelectableEntity -> SelectableEntityImplLua().getNewTable(
+                        SelectableEntityImplLua.Container(
+                            victim
+                        )
+                    )
+                }
+
+                val playerTable = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+                val result = preCheck.call(playerTable, victimTable)
+                if (result.isnil() || !result.isboolean()) {
+                    return false
+                }
+                return result.toboolean()
+            }
+
+            override fun execute(context: SpellTriggerContext.ArrowHitEntity) {
+                val player = context.player
+                val table = PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(player))
+
+                val victim = context.victim
+
+                val victimTable = when (victim) {
+                    is Player -> PlayerImplBaseLua().getNewTable(PlayerImplBaseLua.Container(victim))
+                    is SelectableEntity -> SelectableEntityImplLua().getNewTable(
+                        SelectableEntityImplLua.Container(
+                            victim
+                        )
+                    )
+                }
+                execute.call(table, victimTable)
+            }
+        }
+    }
+
+    private abstract class BaseSpell<T : SpellTriggerContext>(
+        override val identifier: String, displayName: String, description: String,
+        override val cooldownTicks: Int
+    ) : Spell<T> {
+        override val displayName = Component.text(displayName)
+        override val description = Component.text(description)
+    }
+
 
     data class Container(val spell: Spell<*>)
 }

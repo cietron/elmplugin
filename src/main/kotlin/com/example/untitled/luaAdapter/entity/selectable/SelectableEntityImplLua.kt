@@ -20,6 +20,7 @@ import java.util.*
  * @custom.LuaDoc ---@field location vector3d
  * @custom.LuaDoc ---@field normalizedFacingVector vector3d
  * @custom.LuaDoc ---@field isPlayer boolean
+ * @custom.LuaDoc ---@field isOnGround boolean
  * @custom.LuaDoc ---@field get_attribute fun(): attributeSet
  * @custom.LuaDoc ---@field set_attribute fun(attributeName: string, value: number): boolean
  * @custom.LuaDoc ---@field get_tracked_value fun(valueName: string): number
@@ -51,6 +52,7 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
             Vector3dTable().getTable(LuaTable(), Vector3dTable.Container(impl.normalizedFacingVector))
         )
         table.set("isPlayer", LuaValue.valueOf(impl.isPlayer))
+        table.set("isOnGround", LuaValue.valueOf(impl.isOnGround))
 
         table.set("get_attribute", GetAttribute(impl))
         table.set("set_attribute", SetAttribute(impl))
