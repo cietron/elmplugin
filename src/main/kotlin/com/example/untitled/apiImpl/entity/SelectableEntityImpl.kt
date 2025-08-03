@@ -217,4 +217,17 @@ open class SelectableEntityImpl(
             return@registerEvent true
         })
     }
+
+    override fun setNoDamageTick(tick: Int) {
+        val ent = this.getBukkitEntity() ?: return
+        ent.noDamageTicks = tick
+    }
+
+    private fun getBukkitEntity(): LivingEntity? {
+        val ent = Bukkit.getEntity(uuid)
+        return when (Bukkit.getEntity(uuid)) {
+            is LivingEntity -> ent as LivingEntity
+            else -> null
+        }
+    }
 }

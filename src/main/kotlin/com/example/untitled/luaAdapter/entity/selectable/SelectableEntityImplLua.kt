@@ -29,6 +29,8 @@ import java.util.*
  * @custom.LuaDoc ---@field set_velocity fun(velocity: vector3d): boolean
  * @custom.LuaDoc ---@field emitSound fun(soundName: string, volume: number, pitch: number): boolean
  * @custom.LuaDoc ---@field easedMove fun(startPoint: vector3d, endPoint: vector3d, bezierPoints: vector4d, durationTick: integer)
+ * @custom.LuaDoc ---@field setNoDamageTick fun(tick: integer)
+ * @custom.LuaDoc local selectable_entity = {}
  *
  */
 class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(CLASS_NAME, true) {
@@ -86,6 +88,7 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
 
         table.set("emitSound", EntityEmitSoundLua(impl))
         table.set("easedMove", EntityEaseMoveLua(impl))
+        table.set("setNoDamageTick", SetNoDamageTick(impl))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {

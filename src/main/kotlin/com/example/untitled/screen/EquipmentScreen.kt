@@ -52,6 +52,7 @@ class EquipmentScreen(val bukkitPlayer: Player) : PartiallyFrozenChest(FROZEN_SL
 
             if (i in SPELL_SLOTS) {
                 val slot = when (i) {
+                    18 -> Slot.ONE
                     19 -> Slot.ONE
                     20 -> Slot.TWO
                     21 -> Slot.THREE

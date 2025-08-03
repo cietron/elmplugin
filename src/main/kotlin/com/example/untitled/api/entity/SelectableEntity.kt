@@ -30,6 +30,8 @@ interface SelectableEntity {
 
     fun easedMove(startPoint: Vector3d, endPoint: Vector3d, bezierPoints: Vector4d, durationTick: Int)
 
+    fun setNoDamageTick(tick: Int)
+
     var health: Int
     var mana: Int
 }

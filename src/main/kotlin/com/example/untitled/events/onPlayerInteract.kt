@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.*
@@ -101,5 +102,11 @@ class onPlayerInteract : Listener {
         }
 
         this.lastShiftTick[e.player.uniqueId] = Bukkit.getCurrentTick()
+    }
+
+    @EventHandler
+    fun onPlayerJoin(e: PlayerJoinEvent) {
+        val scoreboard = Bukkit.getScoreboardManager().newScoreboard
+        e.player.scoreboard = scoreboard
     }
 }
