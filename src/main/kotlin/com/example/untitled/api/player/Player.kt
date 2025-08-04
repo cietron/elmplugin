@@ -11,6 +11,8 @@ interface Player : SelectableEntity {
 
     fun setCooldown(spellName: String, durationTicks: Int)
 
+    fun isSpellCoolingDown(spellIdentifier: String): Boolean
+
     fun sendActionBarString(msg: String)
 
     fun getEquipments(): List<Equipment>

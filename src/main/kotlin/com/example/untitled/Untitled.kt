@@ -6,7 +6,7 @@ import com.example.untitled.api.spell.Spell
 import com.example.untitled.apiImpl.entity.AttributeManagerImpl
 import com.example.untitled.apiImpl.event.EventManagerImpl
 import com.example.untitled.apiImpl.item.EquipmentManagerImpl
-import com.example.untitled.apiImpl.spell.CooldownManager
+import com.example.untitled.apiImpl.spell.CooldownManagerImpl
 import com.example.untitled.apiImpl.spell.SpellManagerImpl
 import com.example.untitled.apiImpl.store.GenericRepository
 import com.example.untitled.commands.PluginCommands
@@ -33,8 +33,7 @@ class Untitled : JavaPlugin() {
         val eventManager = EventManager()
         val newEventManager = EventManagerImpl()
 
-        // temporary concrete class solution
-        val cooldownManager = CooldownManager(newEventManager)
+        val cooldownManager = CooldownManagerImpl(newEventManager)
 
         val storageManager = StorageImpl()
         val persistentStorage = StorageImpl()

@@ -98,6 +98,8 @@ class AttributeManagerImpl(val storage: Storage, val attributeRepository: Reposi
 
         } catch (e: NoSuchElementException) {
             return false
+        } catch (e: IllegalArgumentException) { // Custom attribute names.
+            return false
         }
 
         return true

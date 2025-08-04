@@ -1,12 +1,12 @@
 package com.example.untitled.apiImpl.entity
 
-import com.example.untitled.Untitled
 import com.example.untitled.api.attribute.AttributeManager
 import com.example.untitled.api.event.EventManager
 import com.example.untitled.api.item.Equipment
 import com.example.untitled.api.item.EquipmentManager
 import com.example.untitled.api.message.Message
 import com.example.untitled.api.player.Player
+import com.example.untitled.api.spell.CooldownManager
 import com.example.untitled.apiImpl.message.MessageProcessor
 import com.example.untitled.storage.Storage
 import net.kyori.adventure.text.Component
@@ -14,7 +14,8 @@ import java.util.*
 
 class PlayerImpl(
     override val name: String, override val uuid: UUID, storage: Storage, eventManager: EventManager,
-    attributeManager: AttributeManager, val equipmentManager: EquipmentManager
+    attributeManager: AttributeManager, val equipmentManager: EquipmentManager,
+    val cooldownManager: CooldownManager
 ) :
     Player, SelectableEntityImpl(uuid, storage, eventManager, attributeManager) {
 
@@ -25,7 +26,11 @@ class PlayerImpl(
     }
 
     override fun setCooldown(spellName: String, durationTicks: Int) {
-        Untitled.cooldownManager.store(this, spellName, durationTicks)
+        return cooldownManager.store(this, spellName, durationTicks)
+    }
+
+    override fun isSpellCoolingDown(spellIdentifier: String): Boolean {
+        return cooldownManager.isCoolingDown(this, spellIdentifier)
     }
 
     override fun sendActionBarString(msg: String) {

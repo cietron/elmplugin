@@ -17,7 +17,8 @@ object EntityFactory {
             Untitled.storageManager,
             Untitled.newEventManager,
             Untitled.attributeManager,
-            Untitled.equipmentManager
+            Untitled.equipmentManager,
+            Untitled.cooldownManager
         )
     }
 

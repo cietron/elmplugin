@@ -9,17 +9,20 @@ class ScriptLoader(val pluginDirectory: File) {
         val scriptDir = pluginDirectory.resolve("scripts")
 
         for (dir in scriptDir.listFiles({ file -> file.isDirectory })) {
-            for (scriptFile in dir.listFiles({ file -> file.extension == "lua" })) {
-                val scriptType =
-                    when (dir.name) {
-                        "spells" -> ScriptManager.ScriptType.spell
-                        "items" -> ScriptManager.ScriptType.item
-                        "lib" -> ScriptManager.ScriptType.library
-                        "startup" -> ScriptManager.ScriptType.startup
-                        "server" -> ScriptManager.ScriptType.server
-                        else -> ScriptManager.ScriptType.none
-                    }
+            val scriptType =
+                when (dir.name) {
+                    "spells" -> ScriptManager.ScriptType.spell
+                    "items" -> ScriptManager.ScriptType.item
+                    "lib" -> ScriptManager.ScriptType.library
+                    "startup" -> ScriptManager.ScriptType.startup
+                    "server" -> ScriptManager.ScriptType.server
+                    else -> ScriptManager.ScriptType.none
+                }
 
+            val scriptFiles = dir.walkTopDown()
+                .filter { file -> file.isFile && file.extension == "lua" && file.absolutePath.startsWith(scriptDir.absolutePath) }
+
+            for (scriptFile in scriptFiles) {
                 scriptManager.loadScript(scriptFile, scriptType)
             }
         }

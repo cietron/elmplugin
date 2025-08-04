@@ -10,7 +10,8 @@ import java.util.*
 /**
  * @custom.LuaDoc ---@class Player : selectable_entity
  * @custom.LuaDoc ---@field name string The player's display name
- * @custom.LuaDoc ---@field setCooldown fun(spellName: string, tickDuration: integer): boolean Sets a cooldown for a spell
+ * @custom.LuaDoc ---@field setCooldown fun(spellIdentifier: string, tickDuration: integer): boolean Sets a cooldown for a spell
+ * @custom.LuaDoc ---@field isSpellCoolingDown fun(spellIdentifier): boolean
  * @custom.LuaDoc ---@field sendMessage fun(msg: message): nil Sends a message to the player. Throws error if the message table is not valid.
  * @custom.LuaDoc ---@field sendPlainChatMessage fun(plainMessage: string)
  * @custom.LuaDoc ---@field sendActionbarMessage fun(message: string): boolean Sends a message to the player's action bar
@@ -33,6 +34,7 @@ class PlayerImplBaseLua : BaseLuaTable<PlayerImplBaseLua.Container>(CLASS_NAME, 
         table.set("sendMessage", SendMessage(player))
         table.set("sendPlainChatMessage", SendPlainChatMessage(player))
         table.set("setCooldown", SetSpellCooldown(player))
+        table.set("isSpellCoolingDown", IsSpellCoolingDown(player))
         table.set("sendActionbarMessage", SendActionbarMessage(player))
         table.set("getEquipments", GetEquipments(player))
     }
