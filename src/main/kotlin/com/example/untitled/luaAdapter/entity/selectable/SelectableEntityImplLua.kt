@@ -30,6 +30,9 @@ import java.util.*
  * @custom.LuaDoc ---@field emitSound fun(soundName: string, volume: number, pitch: number): boolean
  * @custom.LuaDoc ---@field easedMove fun(startPoint: vector3d, endPoint: vector3d, bezierPoints: vector4d, durationTick: integer)
  * @custom.LuaDoc ---@field setNoDamageTick fun(tick: integer)
+ * @custom.LuaDoc ---@field peekTimedValue fun(name: string): nil|number
+ * @custom.LuaDoc ---@field popTimedValue fun(name: string): nil|number
+ * @custom.LuaDoc ---@field pushTimedValue fun(name: string, value: number, expireAfterTicks: integer)
  * @custom.LuaDoc local selectable_entity = {}
  *
  */
@@ -89,6 +92,9 @@ class SelectableEntityImplLua : BaseLuaTable<SelectableEntityImplLua.Container>(
         table.set("emitSound", EntityEmitSoundLua(impl))
         table.set("easedMove", EntityEaseMoveLua(impl))
         table.set("setNoDamageTick", SetNoDamageTick(impl))
+        table.set("peekTimedValue", PeekTimedValue(impl))
+        table.set("popTimedValue", PopTimedValue(impl))
+        table.set("pushTimedValue", PushTimedValues(impl))
     }
 
     override fun checkParseTable(table: LuaTable): Boolean {

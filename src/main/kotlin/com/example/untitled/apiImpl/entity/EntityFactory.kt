@@ -3,6 +3,7 @@ package com.example.untitled.apiImpl.entity
 import com.example.untitled.Untitled
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.player.Player
+import com.example.untitled.apiImpl.server.SchedulerImpl
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -18,7 +19,8 @@ object EntityFactory {
             Untitled.newEventManager,
             Untitled.attributeManager,
             Untitled.equipmentManager,
-            Untitled.cooldownManager
+            Untitled.cooldownManager,
+            SchedulerImpl(Untitled.instance)
         )
     }
 
@@ -27,7 +29,8 @@ object EntityFactory {
             entity.uniqueId,
             Untitled.storageManager,
             Untitled.newEventManager,
-            Untitled.attributeManager
+            Untitled.attributeManager,
+            SchedulerImpl(Untitled.instance)
         )
     }
 

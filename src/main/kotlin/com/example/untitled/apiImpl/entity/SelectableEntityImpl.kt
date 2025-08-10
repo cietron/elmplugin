@@ -5,8 +5,9 @@ import com.example.untitled.api.attribute.AttributeSet
 import com.example.untitled.api.entity.SelectableEntity
 import com.example.untitled.api.event.BuiltinEvents
 import com.example.untitled.api.event.EventManager
-import com.example.untitled.storage.Storage
+import com.example.untitled.api.server.Scheduler
 import com.example.untitled.storage.StorageValue
+import com.example.untitled.storage.UnsafeStorage
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import org.bukkit.Bukkit
@@ -18,9 +19,10 @@ import java.util.*
 
 open class SelectableEntityImpl(
     override val uuid: UUID,
-    val storage: Storage,
+    val storage: UnsafeStorage,
     val eventManager: EventManager,
-    val attributeManager: AttributeManager
+    val attributeManager: AttributeManager,
+    val scheduler: Scheduler
 ) : SelectableEntity {
     companion object {
         const val DEFAULT_HEALTH = 20.0
@@ -221,6 +223,46 @@ open class SelectableEntityImpl(
     override fun setNoDamageTick(tick: Int) {
         val ent = this.getBukkitEntity() ?: return
         ent.noDamageTicks = tick
+    }
+
+    override fun pushTimedValue(name: String, value: Double, afterTicks: Long) {
+
+        val stack = this.getTimedValueStack(name)
+
+        val entry = Pair(value, UUID.randomUUID())
+        stack.push(entry)
+        scheduler.scheduleTask({
+            stack.remove(entry)
+        }, afterTicks)
+    }
+
+    override fun popTimedValue(name: String): Double? {
+        val stack = this.getTimedValueStack(name)
+
+        return try {
+            stack.pop().first
+        } catch (_: EmptyStackException) {
+            null
+        }
+    }
+
+    override fun peekTimedValue(name: String): Double? {
+        val stack = this.getTimedValueStack(name)
+        return try {
+            stack.peek().first
+        } catch (_: EmptyStackException) {
+            null
+        }
+    }
+
+    private fun getTimedValueStack(name: String): Stack<Pair<Double, UUID>> {
+        val key = "selectableEntity#${this.uuid}#timedValueStack#${name}"
+
+        if (storage.retrieveRaw<Stack<Pair<Double, UUID>>>(key) == null) {
+            storage.storeRaw(key, Stack<Pair<Double, UUID>>())
+        }
+
+        return storage.retrieveRaw<Stack<Pair<Double, UUID>>>(key)!!
     }
 
     private fun getBukkitEntity(): LivingEntity? {

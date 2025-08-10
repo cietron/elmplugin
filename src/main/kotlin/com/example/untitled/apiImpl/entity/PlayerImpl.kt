@@ -6,18 +6,19 @@ import com.example.untitled.api.item.Equipment
 import com.example.untitled.api.item.EquipmentManager
 import com.example.untitled.api.message.Message
 import com.example.untitled.api.player.Player
+import com.example.untitled.api.server.Scheduler
 import com.example.untitled.api.spell.CooldownManager
 import com.example.untitled.apiImpl.message.MessageProcessor
-import com.example.untitled.storage.Storage
+import com.example.untitled.storage.UnsafeStorage
 import net.kyori.adventure.text.Component
 import java.util.*
 
 class PlayerImpl(
-    override val name: String, override val uuid: UUID, storage: Storage, eventManager: EventManager,
+    override val name: String, override val uuid: UUID, storage: UnsafeStorage, eventManager: EventManager,
     attributeManager: AttributeManager, val equipmentManager: EquipmentManager,
-    val cooldownManager: CooldownManager
+    val cooldownManager: CooldownManager, scheduler: Scheduler
 ) :
-    Player, SelectableEntityImpl(uuid, storage, eventManager, attributeManager) {
+    Player, SelectableEntityImpl(uuid, storage, eventManager, attributeManager, scheduler) {
 
     override val isPlayer = true
 

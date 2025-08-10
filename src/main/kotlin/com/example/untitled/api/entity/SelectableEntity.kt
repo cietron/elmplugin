@@ -20,6 +20,12 @@ interface SelectableEntity {
 
     fun setTrackedValue(name: String, value: Double): Boolean
 
+    fun pushTimedValue(name: String, value: Double, afterTicks: Long)
+
+    fun popTimedValue(name: String): Double?
+
+    fun peekTimedValue(name: String): Double?
+
     fun kill()
 
     fun setVelocity(velocity: Vector3d): Boolean
