@@ -9,6 +9,7 @@ interface Equipment {
     val vanillaItemID: String
     val type: EquipmentType
     val displayName: Component
+    val lore: List<Component>
     val attributeModifiers: AttributeSet
     fun checkRequirements(context: EquipmentCheckContext): Boolean
 }
@@ -27,4 +28,5 @@ enum class EquipmentType {
     WEAPON,
     RING,
     AMULET,
+    SPELL
 }

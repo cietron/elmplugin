@@ -7,14 +7,16 @@ import com.example.untitled.api.item.EquipmentType
 import com.example.untitled.luaAdapter.attribute.AttributeSetClass
 import com.example.untitled.luaAdapter.util.BaseLuaTable
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.luaj.vm2.LuaTable
 
 /**
  * @custom.LuaDoc ---@class item
  * @custom.LuaDoc ---@field identifier string # Unique identifier for the item
  * @custom.LuaDoc ---@field vanillaItemID string # The vanilla Minecraft item ID
- * @custom.LuaDoc ---@field type string # Refer the api enum class.
- * @custom.LuaDoc ---@field displayName string # Display name of the item
+ * @custom.LuaDoc ---@field type string # One of [HELMET, CHESTPLATE, LEGGINGS, BOOTS, WEAPON, RING, AMULET, SPELL]
+ * @custom.LuaDoc ---@field displayName string # MiniMessage
+ * @custom.LuaDoc ---@field loreArray string[] # MiniMessage
  * @custom.LuaDoc ---@field attributeModifiers attributeSet # Attribute modifiers (delta) for the item
  * @custom.LuaDoc ---@field checkRequirements fun(context: equipmentCheckContext): boolean # Function to check if the item can be equipped
  * @custom.LuaDoc ---@desc Implementation note: The attributes modifiers of equipments are aggregated into a single attributeSet
@@ -33,13 +35,24 @@ class ItemClass : BaseLuaTable<Equipment>("items", true) {
         val vanillaItemID = table.get("vanillaItemID")
         val type = table.get("type")
         val displayName = table.get("displayName")
+        val lore = table.get("loreArray")
         val attributeModifiers = table.get("attributeModifiers")
         val checkRequirementsFunc = table.get("checkRequirements")
+
+        if (lore.istable()) {
+            for (i in 1..(lore as LuaTable).keyCount()) {
+                if (!lore.get(i).isstring()) {
+                    return false
+                }
+            }
+        }
+
 
         return identifier.isstring() &&
                 vanillaItemID.isstring() &&
                 type.isstring() &&
                 displayName.isstring() &&
+                lore.istable() &&
                 attributeModifiers.istable() &&
                 checkRequirementsFunc.isfunction()
     }
@@ -51,8 +64,15 @@ class ItemClass : BaseLuaTable<Equipment>("items", true) {
         val vanillaItemID = table.get("vanillaItemID").tojstring()
         val typeStr = table.get("type").tojstring()
         val displayNameStr = table.get("displayName").tojstring()
+        val loreArray = table.get("loreArray") as LuaTable
         val attributeModifiersTable = table.get("attributeModifiers").checktable()
         val checkRequirementsFunc = table.get("checkRequirements").checkfunction()
+
+        val loreComponentArray = ArrayList<Component>()
+
+        for (i in 1..loreArray.keyCount()) {
+            loreComponentArray.add(MiniMessage.miniMessage().deserialize(loreArray.get(i).tojstring()))
+        }
 
         val type = try {
             EquipmentType.valueOf(typeStr.uppercase())
@@ -67,6 +87,7 @@ class ItemClass : BaseLuaTable<Equipment>("items", true) {
             override val vanillaItemID: String = vanillaItemID
             override val type: EquipmentType = type
             override val displayName: Component = Component.text(displayNameStr)
+            override val lore = loreComponentArray.toList()
             override val attributeModifiers: AttributeSet = attributeModifiers
 
             override fun checkRequirements(context: EquipmentCheckContext): Boolean {

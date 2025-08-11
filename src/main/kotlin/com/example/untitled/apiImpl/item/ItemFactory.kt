@@ -12,7 +12,7 @@ import org.bukkit.persistence.PersistentDataType
 object ItemFactory {
     private val PDCEquipmentIdentifierKey = NamespacedKey.fromString("equipment_id", Untitled.instance)!!
     fun fromEquipment(equipment: Equipment): ItemStack {
-        val mat = Material.matchMaterial(equipment.vanillaItemID) ?: Material.WHITE_WOOL
+        val mat = Material.matchMaterial(equipment.vanillaItemID) ?: Material.PAPER
         val itemStack = ItemStack.of(mat)
 
         itemStack.editPersistentDataContainer { container ->
@@ -22,7 +22,10 @@ object ItemFactory {
             )
         }
 
-        itemStack.editMeta { meta -> meta.displayName(equipment.displayName) }
+        itemStack.editMeta { meta ->
+            meta.displayName(equipment.displayName)
+            meta.lore(equipment.lore)
+        }
 
         return itemStack
     }
@@ -37,8 +40,7 @@ object ItemFactory {
     }
 
     fun fromSpell(spell: Spell<*>): ItemStack {
-        val mat = Material.PAPER
-        val itemStack = ItemStack.of(mat)
+        val itemStack = fromEquipment(spell.spellItem)
 
         itemStack.editPersistentDataContainer { container ->
             container.set(
@@ -46,8 +48,6 @@ object ItemFactory {
                 PersistentDataType.STRING, spell.identifier
             )
         }
-
-        itemStack.editMeta { meta -> meta.displayName(spell.displayName) }
 
         return itemStack
     }
